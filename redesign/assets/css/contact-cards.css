@@ -1,0 +1,75 @@
+/* Contact cards — Instagram and email.
+
+   The Instagram card used a blue→purple gradient that only looked like
+   Instagram's. It now carries the real palette, and both cards share one
+   anatomy: glyph + label on a row, body, then the action line.
+
+   Loads after site.css; only .contact-card and its parts are touched. */
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.9rem 1.6rem;
+}
+
+/* ── Instagram ───────────────────────────────────────────────────────── */
+
+/* Instagram's own stops, with a dark wash over the top. Without it white text
+   sits at 2.58:1 against #fa7e1e — the orange end simply cannot carry a label.
+   The wash keeps the palette recognisable and every stop legible. */
+.contact-card.ig {
+  background:
+    linear-gradient(180deg, rgba(6, 10, 35, 0.34), rgba(6, 10, 35, 0.34)),
+    linear-gradient(135deg, #7b2eff 0%, #d62976 55%, #fa7e1e 100%);
+}
+
+.contact-card.ig p { color: rgba(255, 255, 255, 0.94); }
+
+/* ── email ───────────────────────────────────────────────────────────── */
+
+/* Stays the calm one: Instagram is the channel the studio prefers, so email
+   holds the same shape without competing for attention. The hairline stops it
+   reading as a flat hole on the light page. */
+.contact-card:not(.ig) {
+  background: var(--blue-night);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── shared anatomy ──────────────────────────────────────────────────── */
+
+.contact-card .cc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.55rem;
+}
+
+.contact-card h2 {
+  margin: 0;
+  font-size: var(--step-1);
+  letter-spacing: -0.01em;
+}
+
+.contact-card .cc-glyph {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+}
+
+.contact-card p { flex: 1; line-height: 1.55; }
+
+.contact-card .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  font-weight: 700;
+}
+
+.contact-card .go span { transition: transform 0.2s ease; }
+.contact-card:hover .go span { transform: translateX(3px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card .go span,
+  .contact-card:hover .go span { transition: none; transform: none; }
+}

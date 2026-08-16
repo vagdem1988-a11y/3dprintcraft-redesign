@@ -149,7 +149,8 @@
       let at = 0;
       visible.forEach((card) => {
         const shots = Math.max(1, PF.shotCount(card));
-        const hold = shots * SHOT_MS;
+        // a card holding a clip stays up longer than shots × pace would give it
+        const hold = Math.max(SHOT_MS, PF.holdFor(card, SHOT_MS));
 
         tour.push(setTimeout(() => {
           visible.forEach((c) => c.classList.remove('is-active'));

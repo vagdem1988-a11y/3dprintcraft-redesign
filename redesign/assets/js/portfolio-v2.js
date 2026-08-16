@@ -39,21 +39,46 @@
     });
   });
 
+  /* A shot is either an image URL or "poster|video". Splitting here keeps the
+     rest of the code working in plain URLs. */
+  const posterOf = (shot) => (shot || '').split('|')[0];
+  const videoOf = (shot) => (shot || '').split('|')[1] || null;
+
   /* Extra shots are only fetched the first time a card actually needs them —
      28 cards x 5 shots eagerly would undo the whole point of the image work. */
   function ensureShot(card, i) {
     const m = model.get(card);
     if (m.imgs[i] || !m.shots[i]) return m.imgs[i];
-    const img = document.createElement('img');
-    img.className = 'pf-shot';
-    img.src = m.shots[i];
-    img.alt = '';                 // decorative: shot 0 already carries the description
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.fetchPriority = 'low';
-    card.querySelector('.pf-frame').append(img);
-    m.imgs[i] = img;
-    return img;
+
+    const videoSrc = videoOf(m.shots[i]);
+    let el;
+
+    if (videoSrc) {
+      /* A video shot plays inside the card itself, so an enlarged card shows
+         the clip rather than a frozen frame. preload="none" means nothing is
+         fetched until it is actually shown. */
+      el = document.createElement('video');
+      el.muted = true;
+      el.defaultMuted = true;
+      el.loop = true;
+      el.playsInline = true;
+      el.setAttribute('playsinline', '');
+      el.preload = 'none';
+      el.poster = posterOf(m.shots[i]);
+      el.src = videoSrc;
+    } else {
+      el = document.createElement('img');
+      el.src = posterOf(m.shots[i]);
+      el.alt = '';                // decorative: shot 0 already carries the description
+      el.loading = 'lazy';
+      el.decoding = 'async';
+      el.fetchPriority = 'low';
+    }
+
+    el.className = 'pf-shot';
+    card.querySelector('.pf-frame').append(el);
+    m.imgs[i] = el;
+    return el;
   }
 
   function showShot(card, i) {
@@ -61,20 +86,48 @@
     if (!m.shots.length) return;
     const next = ((i % m.shots.length) + m.shots.length) % m.shots.length;
     ensureShot(card, next);
-    m.imgs.forEach((img, n) => img && img.classList.toggle('is-active', n === next));
+
+    m.imgs.forEach((el, n) => {
+      if (!el) return;
+      el.classList.toggle('is-active', n === next);
+      if (el.tagName !== 'VIDEO') return;
+      if (n === next) {
+        el.play().catch(() => {});      // refused autoplay just leaves the poster
+      } else {
+        el.pause();
+        el.currentTime = 0;
+      }
+    });
+
     m.dots.forEach((dot, n) => dot.classList.toggle('is-active', n === next));
     m.active = next;
   }
 
+  /* A clip needs longer on screen than a photo, so the cycle reschedules itself
+     per shot rather than running on one fixed interval. */
+  const VIDEO_HOLD = 4200;
+
   function startCycle(card, interval) {
     const m = model.get(card);
     if (m.timer || m.shots.length < 2 || reduceMotion) return;
-    m.timer = setInterval(() => showShot(card, m.active + 1), interval);
+
+    /* Based on the shot currently showing, not the one before it — the first
+       delay has to respect a video too, or a clip entered on hover gets
+       advanced away after one photo's worth of time. */
+    const delayForCurrent = () =>
+      (videoOf(m.shots[m.active]) ? Math.max(interval, VIDEO_HOLD) : interval);
+
+    const step = () => {
+      showShot(card, m.active + 1);
+      m.timer = setTimeout(step, delayForCurrent());
+    };
+
+    m.timer = setTimeout(step, delayForCurrent());
   }
 
   function stopCycle(card, reset) {
     const m = model.get(card);
-    if (m.timer) { clearInterval(m.timer); m.timer = 0; }
+    if (m.timer) { clearTimeout(m.timer); m.timer = 0; }
     if (reset) showShot(card, 0);
   }
 
@@ -187,6 +240,18 @@
   const thumbsEl = modal.querySelector('.pv-thumbs');
   const zoomBtn = modal.querySelector('.pv-zoom');
 
+  /* Built once, alongside the still. Video shots swap the two. */
+  const stageVideo = document.createElement('video');
+  stageVideo.className = 'pv-video';
+  stageVideo.muted = true;
+  stageVideo.defaultMuted = true;
+  stageVideo.loop = true;
+  stageVideo.playsInline = true;
+  stageVideo.setAttribute('playsinline', '');
+  stageVideo.preload = 'none';
+  stageVideo.hidden = true;
+  stage.append(stageVideo);
+
   let gallery = { shots: [], thumbs: [], alt: '', at: 0 };
 
   function paint(i) {
@@ -194,14 +259,37 @@
     if (!total) return;
     gallery.at = ((i % total) + total) % total;
     resetZoom();                    // a new shot always starts fully visible
-    stageImg.src = gallery.shots[gallery.at];
+
+    const shot = gallery.shots[gallery.at];
+    const videoSrc = videoOf(shot);
+
+    stageImg.src = posterOf(shot);
     stageImg.alt = total > 1 ? `${gallery.alt} — λήψη ${gallery.at + 1} από ${total}` : gallery.alt;
+    stageImg.hidden = !!videoSrc;
+
+    /* A video shot replaces the still while it is on screen. Muted and looping
+       so it behaves like the other shots rather than like a media player, and
+       always paused the moment you move away from it. */
+    stageVideo.hidden = !videoSrc;
+    if (videoSrc) {
+      if (stageVideo.getAttribute('src') !== videoSrc) {
+        stageVideo.src = videoSrc;
+        stageVideo.poster = posterOf(shot);
+      }
+      stageVideo.play().catch(() => {});
+    } else {
+      stageVideo.pause();
+    }
+
     counterEl.textContent = total > 1 ? `${gallery.at + 1} / ${total}` : '';
     [...thumbsEl.children].forEach((btn, n) =>
       btn.setAttribute('aria-current', String(n === gallery.at))
     );
     // keep the next image warm so swiping feels instant
-    if (total > 1) new Image().src = gallery.shots[(gallery.at + 1) % total];
+    if (total > 1) {
+      const next = gallery.shots[(gallery.at + 1) % total];
+      if (!videoOf(next)) new Image().src = posterOf(next);
+    }
   }
 
   function openGallery(card) {
@@ -222,7 +310,7 @@
         btn.className = 'pv-thumb';
         btn.setAttribute('aria-label', `Λήψη ${n + 1}`);
         const img = document.createElement('img');
-        img.src = gallery.thumbs[n] || gallery.shots[n];
+        img.src = posterOf(gallery.thumbs[n] || gallery.shots[n]);
         img.alt = '';
         img.loading = 'lazy';
         btn.append(img);
@@ -244,6 +332,7 @@
   });
 
   modal.querySelector('.pv-close').addEventListener('click', () => modal.close());
+  modal.addEventListener('close', () => stageVideo.pause());
   modal.querySelector('.pv-prev').addEventListener('click', () => paint(gallery.at - 1));
   modal.querySelector('.pv-next').addEventListener('click', () => paint(gallery.at + 1));
 
@@ -361,6 +450,10 @@
   window.PF = {
     cards,
     shotCount: (card) => model.get(card).shots.length,
+    /* How long the whole card needs on screen at a given per-photo pace —
+       video shots hold longer, so the tour cannot just multiply. */
+    holdFor: (card, perShot) => model.get(card).shots
+      .reduce((total, shot) => total + (videoOf(shot) ? Math.max(perShot, VIDEO_HOLD) : perShot), 0),
     showShot,
     startCycle,
     stopCycle,

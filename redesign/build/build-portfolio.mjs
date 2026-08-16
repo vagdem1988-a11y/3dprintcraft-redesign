@@ -32,6 +32,16 @@ for (const p of projects) {
   const fullShots = [];
 
   for (const shot of p.shots) {
+    if (shot.type === 'video') {
+      /* A video shot travels as "poster|video": the card and the gallery both
+         need the still to show before anything plays, and splitting on the pipe
+         is cheaper than a second pair of data attributes. */
+      const poster640 = variant(shot.poster, 640);
+      const poster1400 = variant(shot.poster, 1400);
+      gridShots.push(`${(await exists(poster640)) ? poster640 : shot.poster}|${shot.src}`);
+      fullShots.push(`${(await exists(poster1400)) ? poster1400 : shot.poster}|${shot.src}`);
+      continue;
+    }
     const small = variant(shot.src, 640);
     const large = variant(shot.src, 1400);
     gridShots.push((await exists(small)) ? small : shot.src);

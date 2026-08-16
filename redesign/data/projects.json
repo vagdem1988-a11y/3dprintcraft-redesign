@@ -99,6 +99,27 @@
         "alt": "NFC stand «Elia» — 3D εκτυπωμένη βάση με NFC tag",
         "width": 1484,
         "height": 1201
+      },
+      {
+        "src": "assets/img/work/shots/08-nfc-stand-elia-01.jpg",
+        "alt": "NFC stand «Elia» — λήψη 2",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/08-nfc-stand-elia-02.jpg",
+        "alt": "NFC stand «Elia» — λήψη 3",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/08-nfc-stand-elia-03.jpg",
+        "alt": "NFC stand «Elia» — λήψη 4",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
       }
     ],
     "full": "assets/img/work/08-nfc-stand-elia.jpg"
@@ -115,6 +136,20 @@
         "alt": "NFC stand «Milu» — 3D εκτυπωμένη βάση με NFC tag",
         "width": 1600,
         "height": 1394
+      },
+      {
+        "src": "assets/img/work/shots/07-nfc-stand-milu-01.jpg",
+        "alt": "NFC stand «Milu» — λήψη 2",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/07-nfc-stand-milu-02.jpg",
+        "alt": "NFC stand «Milu» — λήψη 3",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
       }
     ],
     "full": "assets/img/work/07-nfc-stand-milu.jpg"
@@ -419,6 +454,27 @@
         "alt": "Κρεμαστό 3D εκτυπωμένο φωτιστικό με λευκό φως",
         "width": 1201,
         "height": 1600
+      },
+      {
+        "src": "assets/img/work/shots/05-pendant-lamp-white-01.jpg",
+        "alt": "Φωτιστικό (λευκό) — λήψη 2",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/05-pendant-lamp-white-02.jpg",
+        "alt": "Φωτιστικό (λευκό) — λήψη 3",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/05-pendant-lamp-white-03.jpg",
+        "alt": "Φωτιστικό (λευκό) — λήψη 4",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
       }
     ],
     "full": "assets/img/work/05-pendant-lamp-white.jpg"
@@ -470,6 +526,30 @@
       }
     ],
     "full": "assets/img/work/26-nametag-335sqn.jpg"
+  },
+  {
+    "id": "29-retro-console-keychain",
+    "title": "Μπρελόκ ρετρό κονσόλα",
+    "cat": "gadget",
+    "tag": "Gadgets",
+    "alt": "Μπρελόκ σε σχήμα ρετρό φορητής κονσόλας — 3D εκτυπωμένο λευκό με γκρι οθόνη και κόκκινα κουμπιά",
+    "shots": [
+      {
+        "src": "assets/img/work/29-retro-console-keychain.jpg",
+        "alt": "Μπρελόκ ρετρό κονσόλα — 3D εκτυπωμένο λευκό με κόκκινα κουμπιά",
+        "width": 1600,
+        "height": 2848
+      },
+      {
+        "type": "video",
+        "src": "assets/video/29-retro-console-keychain.mp4",
+        "poster": "assets/img/work/29-retro-console-keychain-video.jpg",
+        "alt": "Μπρελόκ ρετρό κονσόλα — λεπτομέρεια στο ανάγλυφο ηχείο",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "full": "assets/img/work/29-retro-console-keychain.jpg"
   },
   {
     "id": "27-love-hearts-decor",
