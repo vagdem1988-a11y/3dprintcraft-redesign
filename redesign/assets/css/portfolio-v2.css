@@ -1,0 +1,381 @@
+/* 3DPrintCraft — portfolio v2
+   Paired scroll reveal (left card slides in from the left, right card from the
+   right), multi-shot cards that cycle on hover / on a timer on touch, and a
+   swipeable fullscreen gallery. Loads after site.css and only touches .pf-* /
+   .pv-* classes, so nothing on the rest of the site changes.
+   All motion is gated behind prefers-reduced-motion. */
+
+/* ── folded-paper background ─────────────────────────────────────────── */
+
+/* Picks up where the intro video leaves off: it ends on a flat white sheet,
+   and the page underneath is that same sheet, folded. Built from the real
+   logo mark, so it is the brand rather than generic decoration.
+   Fixed attachment means it sits still while cards move over it. */
+.pf-paper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #f4f7fc;
+  /* the same image the intro video's last frame resolves into, so the video
+     appears to settle into the page rather than be replaced by it */
+  background-image: image-set(url("../img/pattern-origami-1080.webp") 1x);
+  background-image: url("../img/pattern-origami-1080.webp");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  /* faint enough that cards and body text keep their contrast */
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* small screens do not need the 1080px file */
+@media (max-width: 500px) {
+  .pf-paper { background-image: url("../img/pattern-origami-640.webp"); }
+}
+
+/* fade it out toward the bottom so the footer stays clean */
+@supports (mask-image: linear-gradient(#000, transparent)) {
+  .pf-paper {
+    -webkit-mask-image: linear-gradient(#000 55%, transparent 100%);
+    mask-image: linear-gradient(#000 55%, transparent 100%);
+  }
+}
+
+/* On a phone the viewport is 9:16, the same shape the image and the intro
+   video were made at, so `cover` lands the pattern at exactly the scale the
+   video freezes on. */
+@media (max-width: 720px) {
+  .pf-paper { opacity: 0.6; }
+}
+
+/* ── filters ─────────────────────────────────────────────────────────── */
+
+.pf-filters {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 0.5rem;
+  margin: 2rem 0 2.4rem;
+  padding: 0.7rem 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(var(--bg) 72%, rgba(245, 246, 249, 0));
+}
+
+.pf-filters::-webkit-scrollbar { display: none; }
+
+.pf-chip {
+  flex: 0 0 auto;
+  min-height: 44px;              /* comfortable thumb target */
+  padding: 0 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--bg-soft);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s;
+}
+
+.pf-chip:hover { border-color: var(--ice); transform: translateY(-1px); }
+.pf-chip:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+.pf-chip[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.pf-count {
+  margin: 0 0 1.4rem;
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+
+/* ── grid ────────────────────────────────────────────────────────────── */
+
+.pf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.7rem, 2.2vw, 1.5rem);
+  align-items: start;
+}
+
+@media (min-width: 760px)  { .pf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1120px) { .pf-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* every other card rides lower, so the two entry directions read as two
+   separate streams rather than one marching row */
+@media (min-width: 700px) {
+  .pf-grid > .pf-card:nth-of-type(even) { margin-top: clamp(1.5rem, 3.5vw, 3rem); }
+}
+
+.pf-card {
+  --from: -30px;                 /* slide-in origin, flipped for the right column */
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* cards only start hidden once the script is running, so a visitor with JS
+   switched off still sees all 28 of them */
+.js-anim .pf-card {
+  opacity: 0;
+  transform: translate3d(var(--from), 14px, 0);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pf-grid > .pf-card:nth-of-type(even) { --from: 30px; }
+
+.js-anim .pf-card.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
+
+/* first shot is visible even before the script wires up the stack */
+.pf-shot:first-of-type { opacity: 1; }
+.js-anim .pf-shot:first-of-type { opacity: 0; }
+.js-anim .pf-shot.is-active { opacity: 1; }
+
+/* filtered-out cards leave the flow entirely */
+.pf-card[hidden] { display: none; }
+
+.pf-card:focus-visible { outline: 3px solid var(--blue); outline-offset: 6px; border-radius: var(--r-md); }
+
+.pf-frame {
+  display: block;                /* spans are inline by default; aspect-ratio needs a block box */
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+  box-shadow: 0 8px 30px rgba(16, 26, 80, 0.08);
+  transition: box-shadow 0.4s, transform 0.4s;
+}
+
+.pf-card:hover .pf-frame { box-shadow: var(--shadow-soft); transform: translateY(-4px); }
+
+.pf-shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pf-shot.is-active { opacity: 1; }
+.pf-card:hover .pf-shot.is-active { transform: scale(1.05); }
+
+/* category label */
+.pf-badge {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  z-index: 2;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(6px);
+  color: var(--ink-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* shot position indicator, only drawn for multi-shot cards */
+.pf-dots {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 5px 7px;
+  border-radius: var(--r-pill);
+  background: rgba(14, 18, 32, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.pf-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transition: background 0.3s, width 0.3s;
+}
+
+.pf-dots i.is-active { width: 14px; border-radius: var(--r-pill); background: #fff; }
+
+.pf-cap {
+  display: block;
+  margin: 0.75rem 0.2rem 0;
+  color: var(--ink);
+  font-size: var(--step--1);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.pf-empty {
+  padding: 4rem 0;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* ── fullscreen gallery ──────────────────────────────────────────────── */
+
+.pv-modal {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: var(--blue-night);
+  color: #fff;
+  overflow: hidden;
+}
+
+.pv-modal::backdrop { background: rgba(6, 9, 26, 0.86); backdrop-filter: blur(4px); }
+
+.pv-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+}
+
+.pv-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: max(0.9rem, env(safe-area-inset-top)) 1rem 0.9rem;
+}
+
+.pv-title { flex: 1; margin: 0; font-size: var(--step-0); font-weight: 700; }
+.pv-counter { color: rgba(255, 255, 255, 0.6); font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+
+.pv-close,
+.pv-zoom,
+.pv-nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.pv-close:hover,
+.pv-zoom:hover,
+.pv-nav:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.06); }
+.pv-close:focus-visible,
+.pv-zoom:focus-visible,
+.pv-nav:focus-visible { outline: 3px solid var(--ice); outline-offset: 2px; }
+
+.pv-zoom { font-size: 1.4rem; font-weight: 600; }
+.pv-zoom[aria-pressed="true"] { background: rgba(255, 255, 255, 0.24); }
+
+.pv-stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;      /* the script owns swipe, pan and zoom gestures */
+}
+
+/* Absolute + inset rather than max-height:100%: as a centred grid item the
+   percentage resolved against an auto-sized row and the picture overflowed the
+   stage, cutting off its bottom. Inset gives object-fit a definite box. */
+.pv-stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0.6rem 3.6rem;
+  border-radius: var(--r-md);
+  object-fit: contain;
+  animation: pv-fade 0.35s ease;
+  cursor: zoom-in;
+  transform-origin: 0 0;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+@media (pointer: coarse) {
+  .pv-stage img { padding: 0.6rem; }   /* no arrow buttons to clear */
+}
+
+.pv-stage.is-zoomed img { cursor: grab; }
+.pv-stage.is-panning img { cursor: grabbing; transition: none; }
+
+/* opacity only — this animation must never touch transform, which belongs to
+   the zoom/pan state */
+@keyframes pv-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.pv-nav {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 2;
+}
+
+.pv-prev { left: 0.6rem; }
+.pv-next { right: 0.6rem; }
+
+/* arrows are mouse affordances; touch users swipe */
+@media (pointer: coarse) { .pv-nav { display: none; } }
+
+.pv-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem max(0.9rem, env(safe-area-inset-bottom));
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pv-thumbs::-webkit-scrollbar { display: none; }
+
+.pv-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.25s, border-color 0.25s;
+}
+
+.pv-thumb img { width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
+.pv-thumb[aria-current="true"] { border-color: #fff; opacity: 1; }
+.pv-thumb:focus-visible { outline: 3px solid var(--ice); outline-offset: 2px; }
+
+/* single-shot projects get no thumbnail strip */
+.pv-thumbs:empty { display: none; }
+
+/* ── reduced motion ──────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .pf-card { opacity: 1; transform: none; transition: none; }
+  .pf-shot, .pf-frame, .pf-chip { transition: none; }
+  .pf-card:hover .pf-shot.is-active { transform: none; }
+  .pv-stage img { animation: none; }
+}

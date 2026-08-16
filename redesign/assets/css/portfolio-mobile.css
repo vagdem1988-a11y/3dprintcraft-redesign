@@ -1,0 +1,202 @@
+/* 3DPrintCraft — paged mobile portfolio.
+   Below 720px the grid stops being a long scroll and becomes pages of four
+   projects, one screenful each, advanced by a single swipe. Page one runs a
+   tour: each card grows while the others dim and its shots cycle. Later pages
+   only cycle shots, no growing.
+   Everything here is scoped to .pf-paged, a class portfolio-mobile.js adds to
+   <html> only when it takes over — desktop is untouched. */
+
+@media (max-width: 720px) {
+  /* One batch of four is the whole screen, so everything above the grid has to
+     be small: the full-size display heading alone was eating 346px of an 812px
+     phone and squeezing the cards down to 164x185. */
+  .pf-paged .section { padding-top: 4.5rem; padding-bottom: 0; }
+  .pf-paged .kicker { margin-bottom: 0.2rem; font-size: 0.68rem; }
+  .pf-paged h1.display-lg { margin: 0 0 0.2rem; font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1.1; }
+  .pf-paged h1.display-lg br { display: none; }
+  .pf-paged .pf-filters { margin: 0.5rem 0 0.7rem; padding: 0.4rem 0; }
+
+  /* Nothing below the current batch until the last page — otherwise the
+     closing call-to-action and the footer appear under every single batch. */
+  .pf-paged .pf-tail,
+  .pf-paged .footer { display: none; }
+  .pf-paged.pf-last .pf-tail,
+  .pf-paged.pf-last .footer { display: revert; }
+
+  /* the batches are swiped, not scrolled */
+  .pf-paged body { overflow: hidden; }
+  .pf-paged.pf-last body { overflow: auto; }
+
+  .pf-paged .pf-grid {
+    /* exactly one screen: header, filters and the caption row already eat
+       into it, so the rows share whatever is left */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    height: var(--pf-page-h, 68dvh);
+    gap: 0.7rem;
+    /* must be none, not pan-y: with pan-y the browser claims vertical drags as
+       scrolling and fires pointercancel, so the swipe handler never sees the
+       gesture finish. Works with a mouse, silently dead on a touchscreen. */
+    touch-action: none;
+  }
+
+  /* A batch moves as one block, so the swipe visibly shifts something. The
+     animation lives on the grid, not the cards — the cards' own transform is
+     already spoken for by the tour's grow-in-place. */
+  .pf-paged .pf-grid {
+    transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.26s ease;
+  }
+
+  .pf-paged .pf-grid.slide-out-up   { transform: translateY(-30px); opacity: 0; }
+  .pf-paged .pf-grid.slide-out-down { transform: translateY(30px);  opacity: 0; }
+
+  /* the starting pose of an arriving batch, set with transitions off */
+  .pf-paged .pf-grid.slide-from-below { transform: translateY(30px);  opacity: 0; transition: none; }
+  .pf-paged .pf-grid.slide-from-above { transform: translateY(-30px); opacity: 0; transition: none; }
+
+  /* cards fade in rather than sliding in from the sides */
+  .pf-paged .pf-card {
+    --from: 0px;
+    height: 100%;
+    min-height: 0;
+    transform: none;
+    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .js-anim.pf-paged .pf-card { opacity: 0; transform: none; }
+  .js-anim.pf-paged .pf-card.is-in { opacity: 1; }
+
+  /* cards off the current page are gone, not just faded */
+  .pf-paged .pf-card[data-page-hidden="1"] { display: none; }
+
+  .pf-paged .pf-frame {
+    aspect-ratio: auto;          /* the grid row decides the height now */
+    height: 100%;
+  }
+
+  .pf-paged .pf-cap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    margin: 0;
+    padding: 1.6rem 0.6rem 0.5rem;
+    background: linear-gradient(transparent, rgba(6, 9, 26, 0.72));
+    color: #fff;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .pf-paged .pf-card { position: relative; }
+
+  /* ── the tour ─────────────────────────────────────────────────────── */
+
+  .pf-paged .pf-grid.is-touring .pf-card {
+    opacity: 0.32;
+    transform: scale(0.9);
+  }
+
+  .pf-paged .pf-grid.is-touring .pf-card.is-active {
+    z-index: 5;
+    opacity: 1;
+    /* grows toward the middle of the screen instead of off its own edge */
+    transform: scale(1.42) translate(var(--grow-x, 0), var(--grow-y, 0));
+  }
+
+  .pf-paged .pf-grid.is-touring .pf-card.is-active .pf-frame {
+    box-shadow: 0 30px 80px rgba(6, 9, 26, 0.45);
+  }
+
+  /* ── page indicator ───────────────────────────────────────────────── */
+
+  .pf-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 0.9rem 0 0;
+    color: var(--ink-3);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pf-pager-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .pf-pager-hint::after {
+    content: "↑";
+    animation: pf-nudge 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pf-nudge {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  .pf-paged .pf-count { display: none; }   /* the pager says it better */
+}
+
+/* ── intro overlay (mobile only, but not size-scoped: the script decides) ── */
+
+/* Same mechanism as the hero video on the homepage: the element is out of the
+   way by default and a class added on `canplay` reveals it. The HTML `hidden`
+   attribute is deliberately not used here — that is what kept the intro
+   invisible while it played. */
+.pf-intro {
+  position: fixed;
+  inset: 0;
+  /* above the dock (130) and the topbar (120) in site.css — a fullscreen intro
+     that the site chrome draws on top of is not fullscreen */
+  z-index: 200;
+  display: none;
+  place-items: center;
+  background: #05070f;
+  opacity: 1;
+  /* slower than a normal dismissal: the video's last frame and the page
+     background are the same picture at different strengths, so this reads as
+     the pattern settling rather than one image swapping for another */
+  transition: opacity 0.9s ease;
+}
+
+.pf-intro.is-live { display: grid; }
+.pf-intro.is-leaving { opacity: 0; pointer-events: none; }
+
+.pf-intro video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Top right: the bottom of the screen belongs to the dock, and the top left to
+   the logo. */
+.pf-intro-skip {
+  position: absolute;
+  right: 1rem;
+  top: max(1rem, env(safe-area-inset-top));
+  z-index: 2;
+  min-height: 44px;
+  padding: 0 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--r-pill);
+  background: rgba(10, 16, 48, 0.55);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-intro-skip:focus-visible { outline: 3px solid var(--ice); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-paged .pf-card,
+  .pf-paged .pf-grid.is-touring .pf-card { transition: none; transform: none; }
+  .pf-pager-hint::after { animation: none; }
+}

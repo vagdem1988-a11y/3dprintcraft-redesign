@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "redesign",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "redesign", "-l", "4331", "--no-clipboard"],
+      "port": 4331
+    },
+    {
+      "name": "current",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "current", "-l", "4322", "--no-clipboard"],
+      "port": 4322
+    }
+  ]
+}

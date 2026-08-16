@@ -1,0 +1,164 @@
+/* Hero call-to-action buttons.
+
+   The two hero buttons were typographically identical — both 58px tall, 16px,
+   weight 700 — so neither led. And below about 400px they did not stack by
+   design: the flex row simply overflowed and wrapped, leaving two pills of
+   different widths.
+
+   Below 720px they become two deliberate full-width bars with a clear weight
+   difference. Above 720px nothing changes.
+   Loads after site.css; only .hero-actions and its buttons are touched. */
+
+/* ── hierarchy (all sizes) ───────────────────────────────────────────── */
+
+/* The secondary was a 14% white wash with no border, which reads as a smudge
+   over the gradient rather than a control. An outline carries it instead. */
+/* A faint dark wash, not transparency. White on the gradient's lightest stop
+   (#4a6bff) measures 4.34:1 — under the 4.5:1 minimum — and the hero's radial
+   highlights can push a button over that stop. This darkens whatever sits
+   behind the label just enough to clear it, and is invisible against the
+   gradient's dark end. */
+.hero-actions .btn-ghost {
+  background: rgba(6, 10, 35, 0.28);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  backdrop-filter: none;
+}
+
+.hero-actions .btn-ghost:hover {
+  background: rgba(6, 10, 35, 0.42);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+/* The DM button now leads, so the portfolio button steps back from a solid
+   white fill to an outline. Same height, same target size, less shout. */
+.hero-actions .btn-light {
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+}
+
+.hero-actions .btn-light:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-actions .btn-arrow {
+  font-size: 1.15em;
+  line-height: 1;
+  transition: transform 0.2s ease;   /* inside the 150-300ms band */
+}
+
+.hero-actions .btn:hover .btn-arrow { transform: translateX(3px); }
+
+/* Instagram mark, inline so it inherits the button's colour via currentColor.
+   Kept monochrome and unmodified — the glyph is Instagram's trademark and is
+   used here only to label a link to the studio's own account. */
+.hero-actions .btn-glyph {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  transition: transform 0.2s ease;
+}
+
+.hero-actions .btn:hover .btn-glyph { transform: scale(1.1); }
+
+/* ── mobile: two full-width bars ─────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;              /* comfortably over the 8px minimum */
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    /* labels start on a shared left edge, glyphs sit right — the centred
+       pills had no vertical rhythm between them */
+    justify-content: space-between;
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+}
+
+/* ── DM button: comet tracing the border ─────────────────────────────── */
+
+/* A registered custom property is what makes an angle animatable at all —
+   plain custom properties interpolate as strings and simply jump. Browsers
+   without @property (older Firefox) get the ring frozen at its start angle,
+   which still looks like a gradient outline. */
+@property --comet-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.hero-actions .btn-ghost {
+  position: relative;
+  isolation: isolate;
+  border-color: rgba(255, 255, 255, 0.18);   /* the ring carries the edge now */
+}
+
+/* Two identical layers: ::before is the crisp filament, ::after the same
+   gradient blurred into a halo. Faking glow — a page cannot exceed white. */
+.hero-actions .btn-ghost::before,
+.hero-actions .btn-ghost::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--comet-angle),
+    transparent 0deg 250deg,
+    rgba(79, 91, 213, 0.35) 268deg,
+    #962fbf 292deg,
+    #d62976 316deg,
+    #fa7e1e 336deg,
+    #feda75 352deg,
+    #fff 359deg,
+    transparent 360deg);
+  /* keep only the 2px rim: fill the box, punch out the middle */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: comet-run 3.4s linear infinite;
+}
+
+.hero-actions .btn-ghost::after {
+  inset: -5px;
+  padding: 5px;
+  filter: blur(9px);
+  opacity: 0.85;
+}
+
+/* paused when the hero is off screen or the tab is hidden — hero-glow.js */
+.hero-paused .hero-actions .btn-ghost::before,
+.hero-paused .hero-actions .btn-ghost::after {
+  animation-play-state: paused;
+}
+
+@keyframes comet-run {
+  to { --comet-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* a still gradient rim instead of a traveling one */
+  .hero-actions .btn-ghost::before,
+  .hero-actions .btn-ghost::after { animation: none; }
+  .hero-actions .btn-ghost::before {
+    background: linear-gradient(90deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+  }
+  .hero-actions .btn-ghost::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-actions .btn-arrow,
+  .hero-actions .btn:hover .btn-arrow,
+  .hero-actions .btn-glyph,
+  .hero-actions .btn:hover .btn-glyph { transition: none; transform: none; }
+}

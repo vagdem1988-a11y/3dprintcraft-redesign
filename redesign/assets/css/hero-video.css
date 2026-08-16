@@ -1,0 +1,60 @@
+/* Hero masthead video — the logo medallion sting.
+   The clip is a bright medallion on near-black. `mix-blend-mode: screen` makes
+   black render as nothing over the blue hero gradient, so the medallion floats
+   with no cutout or alpha channel needed. A radial mask feathers whatever the
+   blend leaves behind at the frame edges.
+   Loads after site.css; only .o-video / .has-video are new. */
+
+/* Hidden until hero-video.js confirms the video is welcome and playable —
+   otherwise the poster frame and the SVG torus would both be on screen. */
+.float-obj.o-video { display: none; }
+
+.hero.has-video .float-obj.o-video {
+  display: block;
+  top: 10%;
+  right: 5%;
+  width: clamp(210px, 21vw, 360px);
+  /* the shared floaty keyframes rotate; a rotating video reads as a wobble,
+     so this one only drifts vertically */
+  animation-name: video-floaty;
+  animation-delay: 0s;
+}
+
+@keyframes video-floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-26px); }
+}
+
+.o-video video,
+.o-video img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+}
+
+/* the fallbacks step aside only once the video is actually live */
+.hero.has-video .float-obj.o1 { display: none; }
+
+@media (max-width: 720px) {
+  /* On a phone there is no room beside the headline, so the medallion stops
+     being an object next to the text and becomes the atmosphere behind it:
+     centred, oversized and dimmed. Text stays at z-index 3, well clear. */
+  .hero.has-video .float-obj.o-video {
+    top: 50%;
+    right: auto;
+    left: 50%;
+    width: 145%;
+    opacity: 0.42;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    animation: none;            /* the drift would fight the centring transform */
+  }
+  .hero.has-video .float-obj.o-benchy { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero.has-video .float-obj.o-video { animation: none; }
+}

@@ -1,0 +1,506 @@
+[
+  {
+    "id": "12-logo-bag-tag",
+    "title": "Tag τσάντας με λογότυπο",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Tag τσάντας — 3D εκτυπωμένο στρογγυλό λευκό/μπλε με λογότυπο",
+    "shots": [
+      {
+        "src": "assets/img/work/12-logo-bag-tag.jpg",
+        "alt": "Tag τσάντας — 3D εκτυπωμένο στρογγυλό λευκό/μπλε με λογότυπο",
+        "width": 1341,
+        "height": 1600
+      },
+      {
+        "src": "assets/img/work/shots/12-logo-bag-tag-03.jpg",
+        "alt": "Tag τσάντας με λογότυπο — λήψη 2",
+        "width": 1178,
+        "height": 1584,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/12-logo-bag-tag-07.jpg",
+        "alt": "Tag τσάντας με λογότυπο — λήψη 3",
+        "width": 1178,
+        "height": 1584,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/12-logo-bag-tag-05.jpg",
+        "alt": "Tag τσάντας με λογότυπο — λήψη 4",
+        "width": 1178,
+        "height": 1584,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/12-logo-bag-tag-08.jpg",
+        "alt": "Tag τσάντας με λογότυπο — λήψη 5",
+        "width": 1178,
+        "height": 1584,
+        "generated": true
+      }
+    ],
+    "full": "assets/img/work/12-logo-bag-tag.jpg"
+  },
+  {
+    "id": "15-zeta-heart-keychain",
+    "title": "Μπρελόκ «Zeta» με καρδιά",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Zeta» — 3D εκτυπωμένο λιλά/μαύρο με καρδιά",
+    "shots": [
+      {
+        "src": "assets/img/work/15-zeta-heart-keychain.jpg",
+        "alt": "Μπρελόκ «Zeta» — 3D εκτυπωμένο λιλά/μαύρο με καρδιά",
+        "width": 1425,
+        "height": 1030
+      },
+      {
+        "src": "assets/img/work/shots/15-zeta-heart-keychain-01.jpg",
+        "alt": "Μπρελόκ «Zeta» με καρδιά — λήψη 2",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/15-zeta-heart-keychain-02.jpg",
+        "alt": "Μπρελόκ «Zeta» με καρδιά — λήψη 3",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/15-zeta-heart-keychain-03.jpg",
+        "alt": "Μπρελόκ «Zeta» με καρδιά — λήψη 4",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      },
+      {
+        "src": "assets/img/work/shots/15-zeta-heart-keychain-04.jpg",
+        "alt": "Μπρελόκ «Zeta» με καρδιά — λήψη 5",
+        "width": 1744,
+        "height": 2336,
+        "generated": true
+      }
+    ],
+    "full": "assets/img/work/15-zeta-heart-keychain.jpg"
+  },
+  {
+    "id": "08-nfc-stand-elia",
+    "title": "NFC stand «Elia»",
+    "cat": "nfc",
+    "tag": "NFC",
+    "alt": "NFC stand «Elia» — 3D εκτυπωμένη βάση με NFC tag",
+    "shots": [
+      {
+        "src": "assets/img/work/08-nfc-stand-elia.jpg",
+        "alt": "NFC stand «Elia» — 3D εκτυπωμένη βάση με NFC tag",
+        "width": 1484,
+        "height": 1201
+      }
+    ],
+    "full": "assets/img/work/08-nfc-stand-elia.jpg"
+  },
+  {
+    "id": "07-nfc-stand-milu",
+    "title": "NFC stand «Milu»",
+    "cat": "nfc",
+    "tag": "NFC",
+    "alt": "NFC stand «Milu» — 3D εκτυπωμένη βάση με NFC tag",
+    "shots": [
+      {
+        "src": "assets/img/work/07-nfc-stand-milu.jpg",
+        "alt": "NFC stand «Milu» — 3D εκτυπωμένη βάση με NFC tag",
+        "width": 1600,
+        "height": 1394
+      }
+    ],
+    "full": "assets/img/work/07-nfc-stand-milu.jpg"
+  },
+  {
+    "id": "01-hopscotch-keychain",
+    "title": "Μπρελόκ «Hopscotch»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Hopscotch» — 3D εκτυπωμένο",
+    "shots": [
+      {
+        "src": "assets/img/work/01-hopscotch-keychain.jpg",
+        "alt": "Μπρελόκ «Hopscotch» — 3D εκτυπωμένο",
+        "width": 896,
+        "height": 1110
+      }
+    ],
+    "full": "assets/img/work/01-hopscotch-keychain.jpg"
+  },
+  {
+    "id": "02-dr8-keychains",
+    "title": "Μπρελόκ DR8 (σετ)",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Σετ μπρελόκ DR8 — 3D εκτυπωμένα",
+    "shots": [
+      {
+        "src": "assets/img/work/02-dr8-keychains.jpg",
+        "alt": "Σετ μπρελόκ DR8 — 3D εκτυπωμένα",
+        "width": 1024,
+        "height": 881
+      }
+    ],
+    "full": "assets/img/work/02-dr8-keychains.jpg"
+  },
+  {
+    "id": "06-scalino-keychain",
+    "title": "Μπρελόκ «Scalino»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Scalino» — 3D εκτυπωμένο",
+    "shots": [
+      {
+        "src": "assets/img/work/06-scalino-keychain.jpg",
+        "alt": "Μπρελόκ «Scalino» — 3D εκτυπωμένο",
+        "width": 1079,
+        "height": 739
+      }
+    ],
+    "full": "assets/img/work/06-scalino-keychain.jpg"
+  },
+  {
+    "id": "09-nomik-keychain",
+    "title": "Μπρελόκ «nomik»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «nomik» — 3D εκτυπωμένο σε τιρκουάζ και λευκό",
+    "shots": [
+      {
+        "src": "assets/img/work/09-nomik-keychain.jpg",
+        "alt": "Μπρελόκ «nomik» — 3D εκτυπωμένο σε τιρκουάζ και λευκό",
+        "width": 1439,
+        "height": 1075
+      }
+    ],
+    "full": "assets/img/work/09-nomik-keychain.jpg"
+  },
+  {
+    "id": "10-kate-camera-keychain",
+    "title": "Μπρελόκ «Kate» με φωτογραφική μηχανή",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Kate» — 3D εκτυπωμένο κόκκινο/λευκό με εικονίδιο φωτογραφικής μηχανής",
+    "shots": [
+      {
+        "src": "assets/img/work/10-kate-camera-keychain.jpg",
+        "alt": "Μπρελόκ «Kate» — 3D εκτυπωμένο κόκκινο/λευκό με εικονίδιο φωτογραφικής μηχανής",
+        "width": 1439,
+        "height": 1413
+      }
+    ],
+    "full": "assets/img/work/10-kate-camera-keychain.jpg"
+  },
+  {
+    "id": "11-john-anchor-keychain",
+    "title": "Μπρελόκ «John» με άγκυρα",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «John» — 3D εκτυπωμένο τιρκουάζ/λευκό με άγκυρα",
+    "shots": [
+      {
+        "src": "assets/img/work/11-john-anchor-keychain.jpg",
+        "alt": "Μπρελόκ «John» — 3D εκτυπωμένο τιρκουάζ/λευκό με άγκυρα",
+        "width": 1440,
+        "height": 1414
+      }
+    ],
+    "full": "assets/img/work/11-john-anchor-keychain.jpg"
+  },
+  {
+    "id": "13-spooky-f4-phantom-keychain",
+    "title": "Μπρελόκ «Spooky F-4 Phantom»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Spooky F-4 Phantom» — 3D εκτυπωμένη φιγούρα μασκότ F-4",
+    "shots": [
+      {
+        "src": "assets/img/work/13-spooky-f4-phantom-keychain.jpg",
+        "alt": "Μπρελόκ «Spooky F-4 Phantom» — 3D εκτυπωμένη φιγούρα μασκότ F-4",
+        "width": 1439,
+        "height": 1402
+      }
+    ],
+    "full": "assets/img/work/13-spooky-f4-phantom-keychain.jpg"
+  },
+  {
+    "id": "14-ngk-anchor-keychain",
+    "title": "Μπρελόκ άγκυρα «NGK»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ άγκυρα «NGK» — 3D εκτυπωμένο λευκό με τιρκουάζ γράμματα",
+    "shots": [
+      {
+        "src": "assets/img/work/14-ngk-anchor-keychain.jpg",
+        "alt": "Μπρελόκ άγκυρα «NGK» — 3D εκτυπωμένο λευκό με τιρκουάζ γράμματα",
+        "width": 1424,
+        "height": 1563
+      }
+    ],
+    "full": "assets/img/work/14-ngk-anchor-keychain.jpg"
+  },
+  {
+    "id": "16-christiana-keychain",
+    "title": "Μπρελόκ «Christiana»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Christiana» — 3D εκτυπωμένο κόκκινο/λευκό script",
+    "shots": [
+      {
+        "src": "assets/img/work/16-christiana-keychain.jpg",
+        "alt": "Μπρελόκ «Christiana» — 3D εκτυπωμένο κόκκινο/λευκό script",
+        "width": 1439,
+        "height": 1051
+      }
+    ],
+    "full": "assets/img/work/16-christiana-keychain.jpg"
+  },
+  {
+    "id": "17-artogefsis-andrikopoulos-keychain",
+    "title": "Μπρελόκ «Αρτογεύσεις & Ανδρικόπουλος»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Αρτογεύσεις & Ανδρικόπουλος» — 3D εκτυπωμένο διπλής όψης για φούρνο",
+    "shots": [
+      {
+        "src": "assets/img/work/17-artogefsis-andrikopoulos-keychain.jpg",
+        "alt": "Μπρελόκ «Αρτογεύσεις & Ανδρικόπουλος» — 3D εκτυπωμένο διπλής όψης για φούρνο",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/17-artogefsis-andrikopoulos-keychain.jpg"
+  },
+  {
+    "id": "18-artichoke-coffee-keychain",
+    "title": "Μπρελόκ «Artichoke Coffee»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Artichoke Coffee» — 3D εκτυπωμένο στρογγυλό λογότυπο καφέ",
+    "shots": [
+      {
+        "src": "assets/img/work/18-artichoke-coffee-keychain.jpg",
+        "alt": "Μπρελόκ «Artichoke Coffee» — 3D εκτυπωμένο στρογγυλό λογότυπο καφέ",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/18-artichoke-coffee-keychain.jpg"
+  },
+  {
+    "id": "19-cayo-bar-keychain",
+    "title": "Μπρελόκ «Cayo»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Cayo» — 3D εκτυπωμένο για cocktail bar",
+    "shots": [
+      {
+        "src": "assets/img/work/19-cayo-bar-keychain.jpg",
+        "alt": "Μπρελόκ «Cayo» — 3D εκτυπωμένο για cocktail bar",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/19-cayo-bar-keychain.jpg"
+  },
+  {
+    "id": "20-margarita-keychain",
+    "title": "Μπρελόκ «Μαργαρίτα»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Μαργαρίτα» — 3D εκτυπωμένο λευκό με λουλούδι",
+    "shots": [
+      {
+        "src": "assets/img/work/20-margarita-keychain.jpg",
+        "alt": "Μπρελόκ «Μαργαρίτα» — 3D εκτυπωμένο λευκό με λουλούδι",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/20-margarita-keychain.jpg"
+  },
+  {
+    "id": "21-minifox-keychain",
+    "title": "Μπρελόκ «minifox»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «minifox» — 3D εκτυπωμένο μαύρο tag με αλεπού",
+    "shots": [
+      {
+        "src": "assets/img/work/21-minifox-keychain.jpg",
+        "alt": "Μπρελόκ «minifox» — 3D εκτυπωμένο μαύρο tag με αλεπού",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/21-minifox-keychain.jpg"
+  },
+  {
+    "id": "22-vellence-keychain",
+    "title": "Μπρελόκ «Vellence»",
+    "cat": "keychain",
+    "tag": "Μπρελόκ",
+    "alt": "Μπρελόκ «Vellence» — 3D εκτυπωμένο μπλε οβάλ",
+    "shots": [
+      {
+        "src": "assets/img/work/22-vellence-keychain.jpg",
+        "alt": "Μπρελόκ «Vellence» — 3D εκτυπωμένο μπλε οβάλ",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/22-vellence-keychain.jpg"
+  },
+  {
+    "id": "03-mannequin-coasters",
+    "title": "Σουβέρ «Mannequin»",
+    "cat": "coaster",
+    "tag": "Σουβέρ",
+    "alt": "Σετ σουβέρ «Mannequin» — 3D εκτυπωμένα",
+    "shots": [
+      {
+        "src": "assets/img/work/03-mannequin-coasters.jpg",
+        "alt": "Σετ σουβέρ «Mannequin» — 3D εκτυπωμένα",
+        "width": 900,
+        "height": 1188
+      }
+    ],
+    "full": "assets/img/work/03-mannequin-coasters.jpg"
+  },
+  {
+    "id": "23-mannequin-bobiras-coaster",
+    "title": "Σουβέρ «Mannequin × Bobiras × Atout»",
+    "cat": "coaster",
+    "tag": "Σουβέρ",
+    "alt": "Σουβέρ «Mannequin × Bobiras × Atout» — 3D εκτυπωμένο συλλεκτικό σουβέρ",
+    "shots": [
+      {
+        "src": "assets/img/work/23-mannequin-bobiras-coaster.jpg",
+        "alt": "Σουβέρ «Mannequin × Bobiras × Atout» — 3D εκτυπωμένο συλλεκτικό σουβέρ",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/23-mannequin-bobiras-coaster.jpg"
+  },
+  {
+    "id": "04-pendant-lamp-warm",
+    "title": "Φωτιστικό (θερμό)",
+    "cat": "lamp",
+    "tag": "Φωτιστικά",
+    "alt": "Κρεμαστό 3D εκτυπωμένο φωτιστικό με θερμό φως",
+    "shots": [
+      {
+        "src": "assets/img/work/04-pendant-lamp-warm.jpg",
+        "alt": "Κρεμαστό 3D εκτυπωμένο φωτιστικό με θερμό φως",
+        "width": 872,
+        "height": 760
+      }
+    ],
+    "full": "assets/img/work/04-pendant-lamp-warm.jpg"
+  },
+  {
+    "id": "05-pendant-lamp-white",
+    "title": "Φωτιστικό (λευκό)",
+    "cat": "lamp",
+    "tag": "Φωτιστικά",
+    "alt": "Κρεμαστό 3D εκτυπωμένο φωτιστικό με λευκό φως",
+    "shots": [
+      {
+        "src": "assets/img/work/05-pendant-lamp-white.jpg",
+        "alt": "Κρεμαστό 3D εκτυπωμένο φωτιστικό με λευκό φως",
+        "width": 1201,
+        "height": 1600
+      }
+    ],
+    "full": "assets/img/work/05-pendant-lamp-white.jpg"
+  },
+  {
+    "id": "24-ntivanaki-nfc-stand",
+    "title": "NFC stand «Ντιβανάκι»",
+    "cat": "stand",
+    "tag": "Stands",
+    "alt": "NFC stand «Ντιβανάκι» — 3D εκτυπωμένη βάση Google review με NFC",
+    "shots": [
+      {
+        "src": "assets/img/work/24-ntivanaki-nfc-stand.jpg",
+        "alt": "NFC stand «Ντιβανάκι» — 3D εκτυπωμένη βάση Google review με NFC",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/24-ntivanaki-nfc-stand.jpg"
+  },
+  {
+    "id": "25-captain-america-phone-stand",
+    "title": "Βάση κινητού «Captain America»",
+    "cat": "gadget",
+    "tag": "Gadgets",
+    "alt": "Βάση κινητού «Captain America» — 3D εκτυπωμένη με ασπίδα",
+    "shots": [
+      {
+        "src": "assets/img/work/25-captain-america-phone-stand.jpg",
+        "alt": "Βάση κινητού «Captain America» — 3D εκτυπωμένη με ασπίδα",
+        "width": 1354,
+        "height": 1600
+      }
+    ],
+    "full": "assets/img/work/25-captain-america-phone-stand.jpg"
+  },
+  {
+    "id": "26-nametag-335sqn",
+    "title": "Nametag 335SQN",
+    "cat": "gadget",
+    "tag": "Gadgets",
+    "alt": "Nametag 335SQN — 3D εκτυπωμένη πλακέτα με F-16",
+    "shots": [
+      {
+        "src": "assets/img/work/26-nametag-335sqn.jpg",
+        "alt": "Nametag 335SQN — 3D εκτυπωμένη πλακέτα με F-16",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/26-nametag-335sqn.jpg"
+  },
+  {
+    "id": "27-love-hearts-decor",
+    "title": "Διακοσμητικό «Love» με καρδιές",
+    "cat": "gift",
+    "tag": "Δώρα",
+    "alt": "Διακοσμητικό «Love» — 3D εκτυπωμένες καρδιές",
+    "shots": [
+      {
+        "src": "assets/img/work/27-love-hearts-decor.jpg",
+        "alt": "Διακοσμητικό «Love» — 3D εκτυπωμένες καρδιές",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/27-love-hearts-decor.jpg"
+  },
+  {
+    "id": "28-rose-bear-gift",
+    "title": "Rose Bear Gift",
+    "cat": "gift",
+    "tag": "Δώρα",
+    "alt": "Rose Bear Gift — 3D εκτυπωμένο αρκουδάκι από τριαντάφυλλα σε κουτί δώρου",
+    "shots": [
+      {
+        "src": "assets/img/work/28-rose-bear-gift.jpg",
+        "alt": "Rose Bear Gift — 3D εκτυπωμένο αρκουδάκι από τριαντάφυλλα σε κουτί δώρου",
+        "width": 922,
+        "height": 1152
+      }
+    ],
+    "full": "assets/img/work/28-rose-bear-gift.jpg"
+  }
+]

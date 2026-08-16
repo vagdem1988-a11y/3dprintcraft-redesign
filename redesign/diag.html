@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Διαγνωστικό βίντεο</title>
+<style>
+  body { margin: 0; padding: 1rem; background: #0e1220; color: #e8ecff;
+         font: 15px/1.45 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  h1 { font-size: 1.1rem; margin: 0 0 .8rem; }
+  .row { display: flex; gap: .6rem; padding: .45rem 0; border-bottom: 1px solid #262c46; }
+  .k { flex: 0 0 46%; color: #99a2c9; }
+  .v { flex: 1; font-weight: 600; word-break: break-word; }
+  .ok { color: #4ade80; }
+  .bad { color: #ff7b6b; }
+  video { width: 100%; max-height: 46vh; margin: 1rem 0 .4rem; background: #000; border-radius: 12px; }
+  button { min-height: 46px; padding: 0 1.1rem; margin: .3rem .3rem .3rem 0; font: inherit; font-weight: 600;
+           color: #fff; background: #2e54ff; border: 0; border-radius: 999px; }
+  #log { margin-top: .8rem; padding: .6rem; background: #070a16; border-radius: 10px;
+         font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>Διαγνωστικό — intro βίντεο</h1>
+
+<div id="facts"></div>
+
+<video id="v" muted playsinline preload="metadata" controls
+       src="assets/video/portfolio-intro.mp4"></video>
+
+<button id="play">▶︎ Δοκιμή αυτόματης αναπαραγωγής</button>
+<button id="clear">Καθαρισμός session</button>
+
+<div id="log"></div>
+
+<script>
+(function () {
+  var facts = document.getElementById('facts');
+  var logEl = document.getElementById('log');
+  var v = document.getElementById('v');
+
+  function log(msg) { logEl.textContent += msg + '\n'; }
+
+  function row(key, value, good) {
+    var d = document.createElement('div');
+    d.className = 'row';
+    var k = document.createElement('span');
+    k.className = 'k';
+    k.textContent = key;
+    var s = document.createElement('span');
+    s.className = 'v' + (good === true ? ' ok' : good === false ? ' bad' : '');
+    s.textContent = String(value);
+    d.append(k, s);
+    facts.append(d);
+  }
+
+  var net = navigator.connection || {};
+  var mq = window.matchMedia('(max-width: 720px)').matches;
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  row('Πλάτος οθόνης', window.innerWidth + ' px');
+  row('Θεωρείται mobile (<=720)', mq ? 'ΝΑΙ' : 'ΟΧΙ', mq);
+  row('Reduce motion', rm ? 'ΝΑΙ — μπλοκάρει το intro' : 'όχι', !rm);
+  row('Save-Data', net.saveData === true ? 'ΝΑΙ — μπλοκάρει' : 'όχι', net.saveData !== true);
+  row('Τύπος σύνδεσης', net.effectiveType || 'άγνωστο');
+  row('Session flag', sessionStorage.getItem('pf-intro-seen') === '1'
+      ? 'ΤΟ ΕΙΔΕ ΗΔΗ — μπλοκάρει' : 'καθαρό',
+      sessionStorage.getItem('pf-intro-seen') !== '1');
+  row('Υποστήριξη MP4/H.264', v.canPlayType('video/mp4; codecs="avc1.4d401f"') || 'ΟΧΙ',
+      !!v.canPlayType('video/mp4; codecs="avc1.4d401f"'));
+  row('Browser', navigator.userAgent.slice(0, 68));
+
+  // does the file actually arrive on this device?
+  fetch('assets/video/portfolio-intro.mp4', { method: 'GET' })
+    .then(function (r) {
+      row('Λήψη βίντεο', 'HTTP ' + r.status + ' · ' + (r.headers.get('content-type') || '?'), r.ok);
+      return r.blob();
+    })
+    .then(function (b) { row('Μέγεθος αρχείου', Math.round(b.size / 1024) + ' KB', b.size > 1000); })
+    .catch(function (e) { row('Λήψη βίντεο', 'ΑΠΕΤΥΧΕ: ' + e.message, false); });
+
+  ['loadedmetadata', 'canplay', 'playing', 'ended', 'stalled', 'suspend', 'error', 'waiting'].forEach(function (ev) {
+    v.addEventListener(ev, function () {
+      log(ev + '  t=' + v.currentTime.toFixed(2) + '  ready=' + v.readyState +
+          (ev === 'error' && v.error ? '  code=' + v.error.code + ' ' + v.error.message : ''));
+    });
+  });
+
+  v.addEventListener('loadedmetadata', function () {
+    row('Διαστάσεις βίντεο', v.videoWidth + '×' + v.videoHeight, v.videoWidth > 0);
+    row('Διάρκεια', v.duration.toFixed(2) + 's', v.duration > 0);
+  });
+
+  document.getElementById('play').addEventListener('click', function () {
+    v.currentTime = 0;
+    v.muted = true;
+    v.playsInline = true;
+    var p = v.play();
+    if (p && p.then) {
+      p.then(function () {
+        log('play() OK');
+        setTimeout(function () {
+          log('μετά από 1.5s: t=' + v.currentTime.toFixed(2) +
+              (v.currentTime > 0.2 ? '  → ΠΑΙΖΕΙ' : '  → ΔΕΝ ΠΡΟΧΩΡΑΕΙ'));
+        }, 1500);
+      }).catch(function (e) { log('play() ΑΠΕΤΥΧΕ: ' + e.name + ' — ' + e.message); });
+    }
+  });
+
+  document.getElementById('clear').addEventListener('click', function () {
+    sessionStorage.removeItem('pf-intro-seen');
+    log('session flag καθαρίστηκε — άνοιξε ξανά το /portfolio');
+  });
+
+  // autoplay attempt exactly as the real page does it
+  var probe = document.createElement('video');
+  probe.muted = true;
+  probe.playsInline = true;
+  probe.setAttribute('playsinline', '');
+  probe.src = 'assets/video/portfolio-intro.mp4';
+  probe.style.cssText = 'position:fixed;width:2px;height:2px;opacity:.01;left:0;bottom:0';
+  document.body.append(probe);
+  var attempt = probe.play();
+  if (attempt && attempt.then) {
+    attempt.then(function () {
+      row('Αυτόματη αναπαραγωγή', 'ΕΠΙΤΡΕΠΕΤΑΙ', true);
+      probe.pause();
+    }).catch(function (e) {
+      row('Αυτόματη αναπαραγωγή', 'ΜΠΛΟΚΑΡΙΣΤΗΚΕ: ' + e.name, false);
+    });
+  } else {
+    row('Αυτόματη αναπαραγωγή', 'άγνωστο (χωρίς promise)');
+  }
+})();
+</script>
+</body>
+</html>
