@@ -9,20 +9,34 @@
    otherwise the poster frame and the SVG torus would both be on screen. */
 .float-obj.o-video { display: none; }
 
+/* The medallion is atmosphere, not an object beside the headline — the same
+   treatment the phone already used, now at every width (owner request
+   2026-08-17): centred, oversized and dimmed, sitting behind the text.
+
+   Sizing is by viewport height, not width. The clip is portrait 540x960, so
+   sizing it off the width made it tower far past a wide hero; tying it to the
+   hero's own height keeps it filling the same share of the screen from a
+   phone to an ultrawide. Text sits at z-index 3, well clear of this at 1. */
 .hero.has-video .float-obj.o-video {
   display: block;
-  top: 10%;
-  right: 5%;
-  width: clamp(210px, 21vw, 360px);
-  /* the shared floaty keyframes rotate; a rotating video reads as a wobble,
-     so this one only drifts vertically */
-  animation-name: video-floaty;
-  animation-delay: 0s;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  width: auto;
+  /* 118svh reproduces what the phone already had — its old width:145% worked
+     out to ~967px tall on a 812px screen — and gives a wide hero the same
+     generous scale. The hero clips, so overflowing it is intended. */
+  height: clamp(420px, 118svh, 1200px);
+  opacity: 0.42;   /* the value the phone already shipped with */
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  animation: none;            /* a drift would fight the centring transform */
 }
 
-@keyframes video-floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-26px); }
+.hero.has-video .float-obj.o-video video,
+.hero.has-video .float-obj.o-video img {
+  width: auto;
+  height: 100%;
 }
 
 .o-video video,
@@ -39,19 +53,9 @@
 .hero.has-video .float-obj.o1 { display: none; }
 
 @media (max-width: 720px) {
-  /* On a phone there is no room beside the headline, so the medallion stops
-     being an object next to the text and becomes the atmosphere behind it:
-     centred, oversized and dimmed. Text stays at z-index 3, well clear. */
-  .hero.has-video .float-obj.o-video {
-    top: 50%;
-    right: auto;
-    left: 50%;
-    width: 145%;
-    opacity: 0.42;
-    z-index: 1;
-    transform: translate(-50%, -50%);
-    animation: none;            /* the drift would fight the centring transform */
-  }
+  /* The centring that used to live here is now the rule at every width. Left
+     behind would re-apply width: 145% on top of the new height and stretch
+     the frame. */
   .hero.has-video .float-obj.o-benchy { display: none; }
 }
 

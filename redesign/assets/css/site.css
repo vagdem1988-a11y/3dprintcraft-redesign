@@ -324,28 +324,6 @@ a { color: inherit; }
   50% { transform: translateY(-32px) rotate(5deg); }
 }
 
-.scroll-cue {
-  position: absolute;
-  z-index: 3;
-  left: 50%;
-  bottom: 92px;
-  transform: translateX(-50%);
-  color: rgba(255,255,255,.75);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: var(--r-pill);
-  padding: 0.5em 1.1em;
-  backdrop-filter: blur(8px);
-  animation: cue-bob 2.4s ease-in-out infinite;
-}
-@keyframes cue-bob { 50% { transform: translate(-50%, 8px); } }
-
 /* ---------- giant-word steps (Ανέβασε / Τυπώνουμε / Παραλαμβάνεις) ---------- */
 .bigwords { text-align: center; }
 .bigwords .word {
@@ -564,7 +542,6 @@ details p { color: var(--ink-2); }
     width: clamp(150px, 42vw, 210px);
     opacity: 0.95;
   }
-  .scroll-cue { display: none; }
   .bigwords .word { flex-direction: row; }
 }
 
@@ -613,7 +590,6 @@ details p { color: var(--ink-2); }
 }
 
 /* scroll cue hides after first scroll */
-.scroll-cue.gone { opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
 
 /* card tilt runs on inline style; give thumb depth */
 .product-card, .work-card { transform-style: preserve-3d; will-change: transform; }
@@ -752,13 +728,17 @@ body::before { /* grain overlay */
     padding: 0.6em 0.62em;
     font-size: 0.8rem;
     transform-origin: center bottom;
-    /* starts after the dock's own 0.4s + 0.8s entrance has settled */
-    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s both;
+    /* starts after the dock's own 0.4s + 0.8s entrance has settled.
+       `backwards`, never `both`: these pills carry the magnetic-pointer
+       transform from line 244, and a forwards fill would pin them at the
+       keyframe and kill dock magnification for the rest of the visit. The
+       last keyframe is the identity transform, so releasing it is seamless. */
+    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s backwards;
   }
 
   /* the two it pushes between give ground, then close back up */
-  .dock a:nth-of-type(2) { animation: shop-shove-l 2.4s ease 1.25s both; }
-  .dock a:nth-of-type(3) { animation: shop-shove-r 2.4s ease 1.25s both; }
+  .dock a:nth-of-type(2) { animation: shop-shove-l 2.4s ease 1.25s backwards; }
+  .dock a:nth-of-type(3) { animation: shop-shove-r 2.4s ease 1.25s backwards; }
 
   .dock-soon em {
     position: absolute;
@@ -807,6 +787,32 @@ body::before { /* grain overlay */
   100%   { transform: translateX(0); }
 }
 
+/* Above 480px the pill has room, so it keeps its place at the end of the row
+   and its label stays for good. It still shoulders its way in — Επικοινωνία,
+   its only neighbour there, leans left — and then ΣΥΝΤΟΜΑ slides out from
+   behind the dock's right rim into the gap beside "Shop" and stays. The last
+   frame is exactly the pill as it has always looked. */
+@media (min-width: 481px) {
+  .dock-soon {
+    transform-origin: center bottom;
+    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s backwards;
+  }
+
+  .dock a:nth-of-type(4) { animation: shop-shove-l 2.4s ease 1.25s backwards; }
+
+  .dock-soon em {
+    /* transforms do not apply to a bare inline box */
+    display: inline-block;
+    animation: shop-label-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 3.4s backwards;
+  }
+}
+
+/* the dock clips at this width, so the label emerges from under its rim */
+@keyframes shop-label-in {
+  from { opacity: 0; transform: translateX(38px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes shop-says {
   0%   { opacity: 0; transform: translate(-50%, 7px) scale(0.72); }
   12%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -817,10 +823,20 @@ body::before { /* grain overlay */
 /* Reduced motion keeps the pill, drops the performance. σύντομα stays in the
    DOM either way, so it is still read out. */
 @media (prefers-reduced-motion: reduce) {
+  /* animation only — leaving `transform` alone lets the base magnetic-pointer
+     rule keep composing */
   .dock-soon,
   .dock a:nth-of-type(2),
-  .dock a:nth-of-type(3) { animation: none; transform: none; }
-  .dock-soon em { animation: none; opacity: 0; }
+  .dock a:nth-of-type(3),
+  .dock a:nth-of-type(4) { animation: none; }
+  .dock-soon em { animation: none; }
+
+  /* Above 480px the label is simply there, as it always was. Below, it is a
+     bubble floating over the dock and only makes sense mid-performance, so it
+     stays down — σύντομα is still in the DOM and still read out. */
+  @media (max-width: 480px) {
+    .dock-soon em { opacity: 0; }
+  }
 }
 
 /* ---------- self-printing hero ----------
