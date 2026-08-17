@@ -315,8 +315,7 @@ a { color: inherit; }
 /* composed as a descending diagonal cluster on the right — the visual
    counterweight to the left text block now that the print-stage is gone */
 .float-obj.o1 { top: 14%; right: 7%; width: clamp(200px, 19vw, 330px); animation-delay: 0s; }
-.float-obj.o2 { top: 56%; right: 15%; width: clamp(110px, 10.5vw, 185px); animation-delay: -3s; }
-.float-obj.o3 { top: 38%; right: 30%; width: clamp(64px, 6.5vw, 110px); animation-delay: -6s; animation-duration: 11s; }
+/* .o2 (cube) and .o3 (sphere) removed from every hero on 2026-08-17 */
 .float-obj.o-benchy { display: none; animation-delay: -2s; } /* mobile-only (see <=720px block) */
 .float-obj.o-benchy img { width: 100%; height: auto; } /* the global img rule caps width only; without height:auto the height attribute distorts it */
 @keyframes floaty {
@@ -534,7 +533,7 @@ details p { color: var(--ink-2); }
   .footer-inner { grid-template-columns: 1fr; }
   .hero h1 { max-width: none; }
   /* mobile: the benchy render replaces the whole desktop cluster */
-  .float-obj.o1, .float-obj.o2, .float-obj.o3 { display: none; }
+  .float-obj.o1 { display: none; }
   .float-obj.o-benchy {
     display: block;
     top: 4.5%;
@@ -707,38 +706,44 @@ body::before { /* grain overlay */
    Every step is a transform, never a width or a margin. A width animation
    would reflow the dock on each frame and fight its own overflow, and the
    overlap while it bulges is the point — it is meant to look too big. */
+/* The pill sits between Portfolio and Χρώματα at every width. Done with flex
+   `order` rather than moving the markup, so the DOM — and the tab order a
+   keyboard walks — keeps Shop last, where a "coming soon" placeholder belongs.
+
+   `backwards`, never `both`, on every one of these: the pills carry the
+   magnetic-pointer transform from line 244, and a forwards fill would pin them
+   at the final keyframe and kill dock magnification for the rest of the visit.
+   Each animation's last keyframe is the identity transform, so letting go of
+   it is seamless. */
+.dock a:nth-of-type(1) { order: 1; }
+.dock a:nth-of-type(2) { order: 2; }
+.dock a:nth-of-type(3) { order: 4; }
+.dock a:nth-of-type(4) { order: 5; }
+.dock-soon { order: 3; }
+
+/* starts once the dock's own 0.4s + 0.8s entrance has settled */
+.dock-soon {
+  transform-origin: center bottom;
+  animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s backwards;
+}
+
+/* the two it forces itself between give ground, then close back up */
+.dock a:nth-of-type(2) { animation: shop-shove-l 2.4s ease 1.25s backwards; }
+.dock a:nth-of-type(3) { animation: shop-shove-r 2.4s ease 1.25s backwards; }
+
 @media (max-width: 480px) {
   /* The bubble has to escape the dock, which clips by default. Safe only
      because the row now fits: nothing spills sideways to scroll. */
   .dock { gap: 2px; padding: 6px 8px; overflow: visible; }
   .dock a { padding: 0.6em 0.58em; }
 
-  /* Slot it between Portfolio and Χρώματα without touching the DOM order,
-     so desktop keeps the pill where it has always been — last. */
-  .dock a:nth-of-type(1) { order: 1; }
-  .dock a:nth-of-type(2) { order: 2; }
-  .dock a:nth-of-type(3) { order: 4; }
-  .dock a:nth-of-type(4) { order: 5; }
-
   .dock-soon {
     display: inline-flex;
     position: relative;
-    order: 3;
     gap: 0;
     padding: 0.6em 0.62em;
     font-size: 0.8rem;
-    transform-origin: center bottom;
-    /* starts after the dock's own 0.4s + 0.8s entrance has settled.
-       `backwards`, never `both`: these pills carry the magnetic-pointer
-       transform from line 244, and a forwards fill would pin them at the
-       keyframe and kill dock magnification for the rest of the visit. The
-       last keyframe is the identity transform, so releasing it is seamless. */
-    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s backwards;
   }
-
-  /* the two it pushes between give ground, then close back up */
-  .dock a:nth-of-type(2) { animation: shop-shove-l 2.4s ease 1.25s backwards; }
-  .dock a:nth-of-type(3) { animation: shop-shove-r 2.4s ease 1.25s backwards; }
 
   .dock-soon em {
     position: absolute;
@@ -787,18 +792,17 @@ body::before { /* grain overlay */
   100%   { transform: translateX(0); }
 }
 
-/* Above 480px the pill has room, so it keeps its place at the end of the row
-   and its label stays for good. It still shoulders its way in — Επικοινωνία,
-   its only neighbour there, leans left — and then ΣΥΝΤΟΜΑ slides out from
-   behind the dock's right rim into the gap beside "Shop" and stays. The last
-   frame is exactly the pill as it has always looked. */
-@media (min-width: 481px) {
-  .dock-soon {
-    transform-origin: center bottom;
-    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s backwards;
-  }
+/* Above 480px there is room for the whole label, so ΣΥΝΤΟΜΑ arrives late and
+   stays rather than flashing in a bubble: it slides out from the right-hand
+   end of the pill into its gap beside "Shop". The last frame is the pill
+   exactly as it has always looked.
 
-  .dock a:nth-of-type(4) { animation: shop-shove-l 2.4s ease 1.25s backwards; }
+   The pill clips to its own outline so the label is invisible until it has
+   travelled inside — without this it would start 38px out, drawn over the
+   Χρώματα tab next door, since .dock-soon is last in the DOM and paints on
+   top of every link. */
+@media (min-width: 481px) {
+  .dock-soon { clip-path: inset(0 round var(--r-pill)); }
 
   .dock-soon em {
     /* transforms do not apply to a bare inline box */
@@ -807,7 +811,6 @@ body::before { /* grain overlay */
   }
 }
 
-/* the dock clips at this width, so the label emerges from under its rim */
 @keyframes shop-label-in {
   from { opacity: 0; transform: translateX(38px); }
   to   { opacity: 1; transform: translateX(0); }
