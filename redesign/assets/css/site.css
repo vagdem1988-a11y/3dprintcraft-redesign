@@ -716,7 +716,112 @@ body::before { /* grain overlay */
   transform-origin: center bottom;
 }
 .dock-soon em { font-style: normal; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ice); }
-@media (max-width: 480px) { .dock-soon { display: none; } }
+/* ---------- "Shop σύντομα" wedges itself into the phone dock ----------
+   This pill was simply hidden below 480px, because it does not fit: the four
+   links need 337px of a 359px dock and the pill is 120px wide. Trimming the
+   dock gaps and the pill's own padding gets all five to 356px — 3px to spare,
+   measured at 375px — but only if the word ΣΥΝΤΟΜΑ leaves the row, since the
+   full label needs 98px where 48px exist.
+
+   So the pill rests as a 48px "Shop" and says ΣΥΝΤΟΜΑ once, in a bubble above
+   itself, where it costs the row nothing. Getting in is the joke: it barges
+   in too wide, the neighbours shove back, it gets squeezed thin and wobbles
+   down to the only width it can have.
+
+   Every step is a transform, never a width or a margin. A width animation
+   would reflow the dock on each frame and fight its own overflow, and the
+   overlap while it bulges is the point — it is meant to look too big. */
+@media (max-width: 480px) {
+  /* The bubble has to escape the dock, which clips by default. Safe only
+     because the row now fits: nothing spills sideways to scroll. */
+  .dock { gap: 2px; padding: 6px 8px; overflow: visible; }
+  .dock a { padding: 0.6em 0.58em; }
+
+  /* Slot it between Portfolio and Χρώματα without touching the DOM order,
+     so desktop keeps the pill where it has always been — last. */
+  .dock a:nth-of-type(1) { order: 1; }
+  .dock a:nth-of-type(2) { order: 2; }
+  .dock a:nth-of-type(3) { order: 4; }
+  .dock a:nth-of-type(4) { order: 5; }
+
+  .dock-soon {
+    display: inline-flex;
+    position: relative;
+    order: 3;
+    gap: 0;
+    padding: 0.6em 0.62em;
+    font-size: 0.8rem;
+    transform-origin: center bottom;
+    /* starts after the dock's own 0.4s + 0.8s entrance has settled */
+    animation: shop-squeeze 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) 1.25s both;
+  }
+
+  /* the two it pushes between give ground, then close back up */
+  .dock a:nth-of-type(2) { animation: shop-shove-l 2.4s ease 1.25s both; }
+  .dock a:nth-of-type(3) { animation: shop-shove-r 2.4s ease 1.25s both; }
+
+  .dock-soon em {
+    position: absolute;
+    left: 50%;
+    /* clears the dock's own 6px top padding — at +7px the bubble's lower edge
+       landed 1px inside the rim and read as part of the bar */
+    bottom: calc(100% + 14px);
+    padding: 0.32em 0.62em;
+    border-radius: var(--r-pill);
+    background: #101736;
+    border: 1px solid rgba(157, 184, 255, 0.34);
+    box-shadow: 0 6px 18px rgba(4, 8, 28, 0.45);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    animation: shop-says 2.4s ease 3.5s both;
+  }
+}
+
+@keyframes shop-squeeze {
+  0%   { transform: scaleX(0.02) scaleY(0.86); opacity: 0; }
+  10%  { transform: scaleX(1.72) scaleY(1.03); opacity: 1; }   /* barges in too wide */
+  24%  { transform: scaleX(0.30) scaleY(1.20); }               /* and gets crushed */
+  38%  { transform: scaleX(1.28) scaleY(0.93); }
+  53%  { transform: scaleX(0.70) scaleY(1.09); }
+  68%  { transform: scaleX(1.13) scaleY(0.97); }
+  83%  { transform: scaleX(0.93) scaleY(1.02); }
+  100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+}
+
+@keyframes shop-shove-l {
+  0%, 4% { transform: translateX(0); }
+  12%    { transform: translateX(-10px); }
+  26%    { transform: translateX(-2px); }
+  44%    { transform: translateX(-6px); }
+  70%    { transform: translateX(-2px); }
+  100%   { transform: translateX(0); }
+}
+
+@keyframes shop-shove-r {
+  0%, 4% { transform: translateX(0); }
+  12%    { transform: translateX(10px); }
+  26%    { transform: translateX(2px); }
+  44%    { transform: translateX(6px); }
+  70%    { transform: translateX(2px); }
+  100%   { transform: translateX(0); }
+}
+
+@keyframes shop-says {
+  0%   { opacity: 0; transform: translate(-50%, 7px) scale(0.72); }
+  12%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  78%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, 5px) scale(0.9); }
+}
+
+/* Reduced motion keeps the pill, drops the performance. σύντομα stays in the
+   DOM either way, so it is still read out. */
+@media (prefers-reduced-motion: reduce) {
+  .dock-soon,
+  .dock a:nth-of-type(2),
+  .dock a:nth-of-type(3) { animation: none; transform: none; }
+  .dock-soon em { animation: none; opacity: 0; }
+}
 
 /* ---------- self-printing hero ----------
    Default = safe state (no JS, reduced motion): finished print, no pin.
