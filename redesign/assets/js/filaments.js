@@ -110,6 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
       img.alt = "";
       img.loading = "lazy";
       img.decoding = "async";
+      /* Without an intrinsic ratio the pill collapses until the photo lands
+         and the whole stack jumps. CSS crops these to fill, so the numbers
+         only need to carry the ratio, not the real pixel size. */
+      img.width = 640;
+      img.height = 640;
 
       const label = document.createElement("span");
       label.append(make("span", "ps-name", f.name));

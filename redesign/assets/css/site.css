@@ -192,7 +192,12 @@ a { color: inherit; }
   gap: 0.55em;
   padding: 0.42em 0.95em 0.42em 0.72em;
   border-radius: var(--r-pill);
-  background: rgba(14, 18, 32, 0.36);
+  /* 0.62, not 0.36. The bar is fixed, so this pill spends most of the visit
+     over the light page rather than the dark hero it was designed against —
+     and at 0.36 it composited to rgb(162,164,171), leaving the white wordmark
+     at 2.49:1 against a required 4.5:1. At 0.62 the worst case is 5.4:1, and
+     over the hero it only gets darker. */
+  background: rgba(14, 18, 32, 0.62);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow-float);
@@ -464,7 +469,9 @@ details p { color: var(--ink-2); }
   gap: 2rem;
   padding: clamp(3rem, 6vw, 5rem) 0 2rem;
 }
-.footer h4 { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,.45); margin: 0 0 1rem; }
+/* h3, not h4: the page's own sections are h2, so the footer's column headings
+   were skipping a level and a screen reader announced a gap that is not there. */
+.footer h3 { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,.45); margin: 0 0 1rem; }
 .footer a { color: rgba(255,255,255,.85); text-decoration: none; }
 .footer a:hover { color: #fff; }
 .footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.95rem; font-weight: 600; }
