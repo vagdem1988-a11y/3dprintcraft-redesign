@@ -248,6 +248,12 @@ document.addEventListener("DOMContentLoaded", () => {
      forever and the dwell could never complete — only act when the pointer
      actually moves to a different swatch. */
   root.addEventListener("pointerover", (e) => {
+    /* A tap fires pointerover as well, and a finger never leaves — hoverEl
+       would latch on the first tap and the scroll picker, which stands down
+       whenever a pointer owns a swatch, would never open another one again.
+       Only a mouse or pen can hover. */
+    if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+
     const sw = e.target.closest(".pal-swatch[data-hex]");
     if (!sw) {                                /* between swatches: hand back to scroll */
       hoverEl = null;
