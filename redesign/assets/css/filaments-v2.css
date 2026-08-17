@@ -77,8 +77,24 @@
   background-size: 100% 100%;
 }
 
+/* The gradient has to ride the glyphs, not sit on the heading box. motion.js
+   wraps each word in a .swi that slides up from 120% below, and a background
+   clipped to text paints in the parent's coordinates — so the letters spent
+   the entire 0.9s reveal outside the painted band and the word rendered
+   nothing at all until it landed, roughly a second in, then popped. Painting
+   the .swi instead lets it slide in coloured, in step with the other words.
+
+   Reduced motion never splits the heading, so the unsplit element keeps the
+   original rule as its fallback. */
+.display .accent.pal-word:has(.swi) { background-image: none; }
+.display .accent.pal-word .swi {
+  background-image: var(--pal-word-gradient, none);
+  background-size: 100% 100%;
+}
+
 @supports (-webkit-background-clip: text) or (background-clip: text) {
-  .display .accent.pal-word {
+  .display .accent.pal-word,
+  .display .accent.pal-word .swi {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
