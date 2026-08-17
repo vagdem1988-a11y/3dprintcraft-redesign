@@ -164,6 +164,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* What each material is actually for. Kept to the properties that decide a
+     choice — heat, flex, sunlight, strength — and to what the studio can
+     stand behind, with no claims about certification or food safety. */
+  const USES = {
+    "PLA Basics": "Το πιο συνηθισμένο υλικό μας. Ιδανικό για διακοσμητικά, μακέτες, δώρα, μπρελόκ και πρωτότυπα. Δεν αντέχει σε ζέστη — μην το αφήσετε σε παρμπρίζ αυτοκινήτου.",
+    "PLA Matte": "Το ίδιο υλικό με ματ φινίρισμα, που κρύβει τις γραμμές της εκτύπωσης. Για αντικείμενα που θα τα δει κάποιος από κοντά.",
+    "ABS": "Αντέχει σε υψηλότερες θερμοκρασίες και σε χτυπήματα. Για λειτουργικά εξαρτήματα και ανταλλακτικά που δουλεύουν, όχι μόνο διακοσμούν.",
+    "PETG Translucent": "Ανθεκτικό και ελαφρώς εύκαμπτο, με διαφάνεια. Για φωτιστικά, καλύμματα και αντικείμενα που έρχονται σε επαφή με νερό.",
+    "TPU": "Λαστιχένιο και εύκαμπτο. Για θήκες, τάπες, λαβές, αποστάτες — ό,τι πρέπει να λυγίζει χωρίς να σπάει.",
+    "ASA": "Σαν το ABS, αλλά αντέχει στον ήλιο χωρίς να κιτρινίζει ή να ψαθυρώνει. Η επιλογή για ό,τι μένει σε εξωτερικό χώρο.",
+    "PA6-CF": "Νάιλον ενισχυμένο με ανθρακονήματα: πολύ δυνατό, άκαμπτο και ανθεκτικό στην τριβή. Για μηχανικά εξαρτήματα υπό φορτίο.",
+    "ABS-GF": "ABS ενισχυμένο με υαλονήματα. Κρατάει τις διαστάσεις του καλύτερα από το σκέτο ABS, για εξαρτήματα που θέλουν ακρίβεια.",
+  };
+
   /* render all categories.
      Each material is its own stack, sorted dark to light like the featured
      band — one 41-pill column would be about 3,000px tall, and tonal order
@@ -183,13 +197,22 @@ document.addEventListener("DOMContentLoaded", () => {
         <h2>${esc(group.cat)}</h2>
         <span class="count">${n} ${n === 1 ? "χρώμα" : "χρώματα"}</span>
       </div>
+      ${USES[group.cat] ? `<p class="pal-use">${esc(USES[group.cat])}</p>` : ""}
       <div class="pal-grid">
         ${group.colors.map(([name, hex], idx) => {
           if (!isHex(hex)) {
-            return `<div class="pal-swatch is-clear is-dark-text" style="--z:${idx + 1}" role="img" aria-label="${esc(name)} — διάφανο">
+            /* A clear filament has no code to copy, but it is still a colour
+               someone picks — as a non-interactive <div> it could not be
+               clicked or tabbed to, so it was the one swatch on the page you
+               could not send to the studio. It copies its name instead.
+               No data-hex: the flood, the dwell clock and the scroll picker
+               all key off a real colour and must keep skipping it. */
+            return `<button class="pal-swatch is-clear is-dark-text" type="button" style="--z:${idx + 1}"
+              data-name="${esc(name)}" data-cat="${esc(group.cat)}" aria-label="${esc(name)} — διάφανο, αντιγραφή">
+              <span class="copied">Αντιγράφηκε!</span>
               <span class="pname">${esc(name)}</span>
               <span class="phex">διάφανο</span>
-            </div>`;
+            </button>`;
           }
           /* pick whichever of ink/white actually contrasts more; if neither
              reaches AA 4.5:1, underlay a dark scrim behind white text */
@@ -421,16 +444,22 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   root.addEventListener("click", (e) => {
-    const sw = e.target.closest(".pal-swatch[data-hex]");
+    /* keyed on data-name, not data-hex: the clear swatch has a name and a
+       category but no code, and it is copyable too */
+    const sw = e.target.closest(".pal-swatch[data-name]");
     if (!sw) return;
-    const hex = sw.dataset.hex;
+    const hex = sw.dataset.hex || null;
     /* A bare hex is a strange thing to send in a DM. Copy something the
        studio can read back: "Lilac Purple — PLA Matte (#AE96D4)". */
-    const phrase = sw.dataset.name + " — " + sw.dataset.cat + " (" + hex + ")";
+    const phrase = sw.dataset.name + " — " + sw.dataset.cat +
+      " (" + (hex || "διάφανο") + ")";
     clearTimeout(sw._t); /* per-element timer: rapid re-clicks restart the full duration */
 
-    setFlood(hex);
-    enterFocus(sw);              /* picking it counts as studying it */
+    /* nothing to flood or study with a colourless filament */
+    if (hex) {
+      setFlood(hex);
+      enterFocus(sw);            /* picking it counts as studying it */
+    }
     const showCopied = () => {
       sw.classList.add("just-copied");
       announce("Αντιγράφηκε: " + phrase);
@@ -439,8 +468,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const showManual = () => {
       const cap = sw.querySelector(".phex");
       if (!cap.dataset.orig) cap.dataset.orig = cap.textContent;
-      cap.textContent = "επίλεξε: " + hex;
-      announce("Η αντιγραφή δεν είναι διαθέσιμη — ο κωδικός είναι " + hex);
+      cap.textContent = "επίλεξε: " + (hex || sw.dataset.name);
+      announce(hex
+        ? "Η αντιγραφή δεν είναι διαθέσιμη — ο κωδικός είναι " + hex
+        : "Η αντιγραφή δεν είναι διαθέσιμη — ζητήστε το " + sw.dataset.name);
       sw._t = setTimeout(() => (cap.textContent = cap.dataset.orig), 2000);
     };
 

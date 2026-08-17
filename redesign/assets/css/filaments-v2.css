@@ -261,6 +261,19 @@
   pointer-events: none;
 }
 
+/* What the material is for, between its heading and its stack. Held to a
+   readable measure rather than the full column width, and greyed with the
+   rest of the page furniture in study mode. */
+.pal-use {
+  margin: -0.35rem 0 1rem;
+  max-width: 62ch;
+  color: var(--ink-2, #4a5068);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.pal-focus .pal-use { filter: grayscale(1); transition: filter 0.5s ease; }
+
 /* ── the 41 swatches: same stack, flat and true ──────────────────────── */
 
 /* Deliberately not glass. The featured band is the showpiece; these are the
