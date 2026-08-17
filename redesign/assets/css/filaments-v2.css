@@ -1,0 +1,262 @@
+/* Colours page — featured band + colour flood.
+
+   The band pairs a filament colour with a real print in that colour. The grid
+   below is unchanged in behaviour; touching a swatch floods the page behind it
+   with that colour so it can be judged at more than swatch size.
+
+   Loads after site.css. */
+
+/* ── the flood ───────────────────────────────────────────────────────── */
+
+.pal-flood {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 90% at 50% 30%, var(--flood, transparent) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease, background 0.5s ease;
+  pointer-events: none;
+}
+
+.pal-flood.is-on { opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pal-flood { transition: none; }
+}
+
+/* ── "χρώμα" painted in the featured colours ─────────────────────────── */
+
+/* The gradient itself is written by filaments.js from the same FEATURED list
+   the stack uses, so the word and the band can never drift apart. Falls back
+   to the plain accent blue anywhere background-clip: text is unsupported. */
+.display .accent.pal-word {
+  background-image: var(--pal-word-gradient, none);
+  background-size: 100% 100%;
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .display .accent.pal-word {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* ── featured band ───────────────────────────────────────────────────── */
+
+.pal-featured { margin: 2.4rem 0 3rem; }
+
+.pal-featured .pal-stage h2,
+.pal-featured .pal-stage .pf-sub { color: #fff; }
+
+.pal-featured h2 {
+  margin: 0 0 0.3rem;
+  font-size: var(--step-1);
+  letter-spacing: -0.02em;
+}
+
+.pal-featured .pf-sub {
+  margin: 0 0 1.4rem;
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+
+/* The stack sits on a glow made from the inverted values of the very colours
+   stacked on it — JS writes --inv-1..6 from each hex. */
+.pal-stage {
+  position: relative;
+  padding: clamp(2rem, 6vw, 3.4rem) clamp(1rem, 4vw, 2.5rem);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background:
+    radial-gradient(80% 55% at 15% 12%, var(--inv-1, #444) 0%, transparent 60%),
+    radial-gradient(70% 50% at 85% 22%, var(--inv-2, #333) 0%, transparent 62%),
+    radial-gradient(85% 60% at 25% 78%, var(--inv-4, #222) 0%, transparent 65%),
+    radial-gradient(75% 55% at 80% 88%, var(--inv-6, #111) 0%, transparent 60%),
+    #0b1020;
+}
+
+.pal-strips {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Overlapping pills: each one covers most of the one above, so only a band of
+   every colour shows — the label and the print both live in that band. */
+.pal-strips {
+  --pal-overlap: 54px;
+}
+
+/* Glass: the pill is the colour at 66% over a blur of the glow behind it, with
+   a lit top edge and a rim. JS sets --pill and picks the label tone from the
+   *blended* result, not the raw hex — translucency darkens every colour here,
+   so contrast has to be judged on what actually ends up on screen. */
+.pal-strip {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  min-height: 118px;
+  margin-top: calc(-1 * var(--pal-overlap));
+  padding: 0.85rem 1.4rem 0;
+  border-radius: 999px;
+  overflow: hidden;
+  text-decoration: none;
+  isolation: isolate;
+  background: color-mix(in srgb, var(--pill, #888) 66%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  backdrop-filter: blur(16px) saturate(1.35);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 -6px 22px rgba(4, 8, 24, 0.35);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-bottom 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s ease;
+}
+
+.pal-strip:first-child { margin-top: 0; }
+
+/* later pills sit in front, which is what makes it read as a stack */
+.pal-strip:nth-child(1) { z-index: 1; }
+.pal-strip:nth-child(2) { z-index: 2; }
+.pal-strip:nth-child(3) { z-index: 3; }
+.pal-strip:nth-child(4) { z-index: 4; }
+.pal-strip:nth-child(5) { z-index: 5; }
+.pal-strip:nth-child(6) { z-index: 6; }
+
+/* The hovered pill stays exactly where it is — no lift — so the one below can
+   come to rest flush against it. It still has to jump above its neighbours,
+   since later pills normally sit in front. */
+.pal-strip:hover,
+.pal-strip:focus-visible {
+  z-index: 10;
+  box-shadow: 0 18px 44px rgba(4, 8, 24, 0.5);
+}
+
+/* Everything below drops by exactly the overlap. Visible band + overlap equals
+   the pill height, so the next pill's top edge lands on the hovered pill's
+   bottom edge: fully revealed, touching, no gap. Nothing above moves. */
+.pal-strip:hover ~ .pal-strip,
+.pal-strip:focus-visible ~ .pal-strip {
+  transform: translateY(var(--pal-overlap));
+}
+
+.pal-strip img {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
+  width: 38%;
+  height: 100%;
+  object-fit: cover;
+  /* fades into the flat colour instead of sitting in a hard-edged box */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%);
+  mask-image: linear-gradient(90deg, transparent, #000 55%);
+}
+
+/* deal in from below, one after another, when the band arrives */
+.js-anim .pal-strip { opacity: 0; transform: translateY(26px); }
+.pal-strips.is-in .pal-strip { opacity: 1; transform: translateY(0); }
+.pal-strips.is-in .pal-strip:hover { transform: none; }
+.pal-strips.is-in .pal-strip:hover ~ .pal-strip { transform: translateY(var(--pal-overlap)); }
+.pal-strips.is-in .pal-strip:nth-child(1) { transition-delay: 0s; }
+.pal-strips.is-in .pal-strip:nth-child(2) { transition-delay: 0.07s; }
+.pal-strips.is-in .pal-strip:nth-child(3) { transition-delay: 0.14s; }
+.pal-strips.is-in .pal-strip:nth-child(4) { transition-delay: 0.21s; }
+.pal-strips.is-in .pal-strip:nth-child(5) { transition-delay: 0.28s; }
+.pal-strips.is-in .pal-strip:nth-child(6) { transition-delay: 0.35s; }
+
+.pal-strip .ps-name {
+  font-size: var(--step-0);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pal-strip .ps-meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/* the text colour each strip needs is decided per swatch in JS */
+.pal-strip.on-dark { color: #fff; }
+.pal-strip.on-light { color: var(--ink); }
+
+.pal-strip:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* the diagonal sheen that sells it as glass rather than tinted plastic */
+.pal-strip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 26%,
+    transparent 48%);
+  pointer-events: none;
+}
+
+/* ── the 41 swatches: same stack, flat and true ──────────────────────── */
+
+/* Deliberately not glass. The featured band is the showpiece; these are the
+   colours someone actually orders from, so they stay the exact hex. */
+.pal-grid {
+  display: flex;
+  flex-direction: column;
+  --pal-overlap: 52px;
+}
+
+.pal-grid .pal-swatch {
+  height: auto;
+  min-height: 108px;
+  margin-top: calc(-1 * var(--pal-overlap));
+  padding: 0.75rem 1.3rem 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  z-index: var(--z, 1);
+  box-shadow: 0 -5px 18px rgba(16, 26, 80, 0.16);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.pal-grid .pal-swatch:first-child { margin-top: 0; }
+
+/* name and code stay on screen for every colour, never only on hover */
+.pal-grid .pal-swatch .pname,
+.pal-grid .pal-swatch .phex { position: static; opacity: 1; }
+.pal-grid .pal-swatch .phex { font-variant-numeric: tabular-nums; opacity: 0.8; }
+
+/* subtle: a lift, not a reveal — the label is already readable */
+.pal-grid .pal-swatch:hover,
+.pal-grid .pal-swatch:focus-visible {
+  z-index: 50;
+  transform: translateY(-8px);
+  box-shadow: 0 16px 34px rgba(16, 26, 80, 0.28);
+}
+
+@media (min-width: 760px) {
+  .pal-strips { --pal-overlap: 60px; }
+  .pal-strip { min-height: 132px; }
+  .pal-strip:first-child { margin-top: 0; }
+  .pal-grid { --pal-overlap: 56px; }
+  .pal-grid .pal-swatch { min-height: 116px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .pal-strip { opacity: 1; transform: none; }
+  .pal-strip,
+  .pal-strip:hover,
+  .pal-strip:focus-visible,
+  .pal-strip:hover ~ .pal-strip,
+  .pal-grid .pal-swatch,
+  .pal-grid .pal-swatch:hover { transition: none; transform: none; }
+}

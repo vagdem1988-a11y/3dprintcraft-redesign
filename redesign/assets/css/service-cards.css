@@ -1,0 +1,90 @@
+/* Service cards — watermark + icon animation.
+
+   Each card carries its icon twice: once small at the top, once blown up and
+   very faint, bleeding off the bottom-right corner. The card that sits nearest
+   the middle of the screen gets .is-live and its icon animates; on a desktop,
+   hovering does the same. Everything stops under prefers-reduced-motion.
+
+   Loads after site.css; only .service-card internals are touched. */
+
+.service-card {
+  position: relative;
+  overflow: hidden;             /* the watermark is cropped by the card edge */
+  isolation: isolate;
+}
+
+.service-card > *:not(.sc-bg) { position: relative; z-index: 1; }
+
+/* ── watermark ───────────────────────────────────────────────────────── */
+
+/* `.service-card svg` in site.css pins every icon to 44px, so the watermark
+   needs the extra specificity or it renders at icon size. */
+.service-card .sc-bg {
+  position: absolute;
+  right: -14%;
+  bottom: -18%;
+  z-index: 0;
+  width: 68%;
+  height: auto;
+  color: var(--blue);
+  opacity: 0.06;               /* texture, not decoration competing with text */
+  pointer-events: none;
+}
+
+/* ── the animations ──────────────────────────────────────────────────── */
+
+/* print head tracks across the gantry and the extruded line draws itself */
+.sc-filament {
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+}
+
+.is-live .sc-head { animation: sc-track 2.6s ease-in-out infinite; }
+.is-live .sc-filament { animation: sc-extrude 2.6s ease-in-out infinite; }
+
+@keyframes sc-track {
+  0%, 100% { transform: translateX(-3.2px); }
+  50% { transform: translateX(3.2px); }
+}
+
+@keyframes sc-extrude {
+  0% { stroke-dashoffset: 12; }
+  55% { stroke-dashoffset: 0; }
+  90%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* the tap: three arcs firing outward in turn */
+.sc-wave { opacity: 0.25; transform-origin: 12px 12px; }
+.is-live .sc-wave { animation: sc-ping 1.8s ease-out infinite; }
+.is-live .sc-wave.w2 { animation-delay: 0.2s; }
+.is-live .sc-wave.w3 { animation-delay: 0.4s; }
+
+@keyframes sc-ping {
+  0% { opacity: 0.15; }
+  35% { opacity: 1; }
+  70%, 100% { opacity: 0.15; }
+}
+
+/* the page scrolls inside its window */
+.is-live .sc-page { animation: sc-scroll 3.2s linear infinite; }
+
+@keyframes sc-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
+/* a live card lifts its small icon slightly, so the active one is obvious
+   even before you notice what is moving */
+.service-card .sc-icon { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.service-card.is-live .sc-icon { transform: translateY(-2px) scale(1.04); }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-live .sc-head,
+  .is-live .sc-filament,
+  .is-live .sc-wave,
+  .is-live .sc-page { animation: none; }
+  .sc-filament { stroke-dashoffset: 0; }
+  .sc-wave { opacity: 0.55; }
+  .service-card .sc-icon,
+  .service-card.is-live .sc-icon { transition: none; transform: none; }
+}
