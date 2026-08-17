@@ -528,7 +528,9 @@
       </div>
       <div class="pv-stage">
         <button class="pv-nav pv-prev" type="button" aria-label="Προηγούμενη λήψη">‹</button>
-        <img src="" alt="">
+        <!-- No src until the gallery opens one: src="" resolves to the page's
+             own URL, so every visit downloaded portfolio.html a second time. -->
+        <img alt="">
         <button class="pv-nav pv-next" type="button" aria-label="Επόμενη λήψη">›</button>
       </div>
       <div class="pv-thumbs" role="group" aria-label="Λήψεις έργου"></div>
