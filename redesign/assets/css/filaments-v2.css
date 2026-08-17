@@ -24,6 +24,49 @@
   .pal-flood { transition: none; }
 }
 
+/* ── study mode ──────────────────────────────────────────────────────── */
+
+/* Held on a colour for five seconds, or having copied it, everything else on
+   screen loses its hue and the flood goes to the exact colour at full
+   strength. A hue shifts perceptually depending on what sits beside it, so
+   forty saturated neighbours make a colour genuinely hard to judge.
+
+   The filter is applied to each element rather than to a shared ancestor:
+   `filter` on a parent cannot be undone on a child, and it would also create
+   a containing block that breaks the fixed flood layer. */
+.pal-focus .pal-swatch:not(.is-focus),
+.pal-focus .pal-featured,
+.pal-focus .topbar,
+.pal-focus .dock,
+.pal-focus .footer,
+.pal-focus .pal-cat,
+.pal-focus .filter-row,
+.pal-focus .pal-note {
+  filter: grayscale(1);
+  transition: filter 0.5s ease;
+}
+
+/* The flood stops being a tint and becomes the colour itself: a flat fill, not
+   a gradient. At full opacity the radial version was still mostly transparent,
+   because it fades out at 70% — the falloff has to go, not just the alpha. */
+.pal-focus .pal-flood.is-on {
+  opacity: 1;
+  background: var(--flood, transparent);
+}
+
+/* On a flood of its own colour the chosen swatch would vanish, so it keeps a
+   rim and a shadow to hold its edge. Scoped to .pal-grid so it out-ranks
+   `.pal-grid .pal-swatch`, which sets the stack's z-index and is declared
+   later in this file. */
+.pal-grid .pal-swatch.is-focus {
+  z-index: 60;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 22px 50px rgba(16, 26, 80, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pal-focus .pal-swatch:not(.is-focus) { transition: none; }
+}
+
 /* ── "χρώμα" painted in the featured colours ─────────────────────────── */
 
 /* The gradient itself is written by filaments.js from the same FEATURED list
@@ -219,10 +262,11 @@
   padding: 0.75rem 1.3rem 0;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.14);
+  /* name and code sit together as one label, not pinned to opposite edges */
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 0.6rem;
   z-index: var(--z, 1);
   box-shadow: 0 -5px 18px rgba(16, 26, 80, 0.16);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
@@ -241,6 +285,24 @@
   z-index: 50;
   transform: translateY(-8px);
   box-shadow: 0 16px 34px rgba(16, 26, 80, 0.28);
+}
+
+/* Whichever swatch is nearest the middle of the screen opens itself as you
+   scroll — the same reveal hovering gives, for the phone where nothing hovers.
+   filaments.js owns the class. */
+.pal-grid .pal-swatch.is-live {
+  z-index: 40;
+  box-shadow: 0 16px 34px rgba(16, 26, 80, 0.26);
+}
+
+.pal-grid .pal-swatch.is-live ~ .pal-swatch {
+  transform: translateY(var(--pal-overlap));
+}
+
+/* a hovered swatch still wins over the scrolled-to one */
+.pal-grid .pal-swatch:hover ~ .pal-swatch,
+.pal-grid .pal-swatch:focus-visible ~ .pal-swatch {
+  transform: translateY(var(--pal-overlap));
 }
 
 @media (min-width: 760px) {

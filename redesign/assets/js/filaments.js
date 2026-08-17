@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
   const contrast = (l1, l2) => (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  const docEl = document.documentElement;
   const INK_L = luminance("#0e1220");
   const STAGE = "#0b1020";              /* what the glass sits on */
   const blend = (hex, over, alpha) => {
@@ -242,11 +243,152 @@ document.addEventListener("DOMContentLoaded", () => {
     flood.classList.add("is-on");
   };
 
+  /* pointerover bubbles from the name and code inside a swatch, so it fires
+     again on every small movement. Re-arming on each one restarted the clock
+     forever and the dwell could never complete — only act when the pointer
+     actually moves to a different swatch. */
   root.addEventListener("pointerover", (e) => {
     const sw = e.target.closest(".pal-swatch[data-hex]");
-    if (sw) setFlood(sw.dataset.hex);
+    if (!sw) {                                /* between swatches: hand back to scroll */
+      hoverEl = null;
+      if (liveSwatch) liveSwatch.classList.add("is-live");
+      return;
+    }
+    if (sw === hoverEl) return;
+    hoverEl = sw;
+
+    /* The scroll-opened swatch closes when the pointer takes over, so only one
+       is ever open. Clearing every open swatch rather than just the one the
+       picker remembers means a stale class can never leave two stacks apart.
+       The reference survives, so it reopens when the pointer leaves. */
+    root.querySelectorAll(".pal-swatch.is-live").forEach((el) => {
+      if (el !== sw) el.classList.remove("is-live");
+    });
+    setFlood(sw.dataset.hex);
+    if (sw !== focusEl) { clearFocus(); armDwell(sw); }
   });
-  root.addEventListener("pointerleave", () => setFlood(null));
+    /* leaving the palette hands control back to the scroll picker */
+  root.addEventListener("pointerleave", () => {
+    hoverEl = null;
+    if (liveSwatch) liveSwatch.classList.add("is-live");
+    setFlood(null);
+    clearTimeout(dwellTimer);
+  });
+
+  /* ── study mode ─────────────────────────────────────────────────────
+     Dwell on one colour for five seconds — by hovering or by scrolling it to
+     the middle and stopping — or copy its code, and everything else drops to
+     greyscale while the flood goes to full strength. Judging a hue beside
+     forty others is the problem this solves.
+
+     The dwell clock only runs once scrolling has stopped, so drifting past ten
+     colours never triggers it on one nobody was looking at. */
+  const DWELL_MS = 3500;
+  let focusEl = null;
+  let liveSwatch = null;        /* whatever the scroll picker currently centres */
+  let hoverEl = null;           /* whatever the pointer is currently over */
+  let dwellTimer = 0;
+  let scrolling = 0;
+
+  function clearFocus() {
+    clearTimeout(dwellTimer);
+    if (!focusEl) return;
+    focusEl.classList.remove("is-focus");
+    focusEl = null;
+    docEl.classList.remove("pal-focus");
+  }
+
+  function enterFocus(sw) {
+    if (!sw || sw === focusEl) return;
+    if (focusEl) focusEl.classList.remove("is-focus");
+    focusEl = sw;
+    sw.classList.add("is-focus");
+    docEl.classList.add("pal-focus");
+    if (sw.dataset.hex) setFlood(sw.dataset.hex);
+  }
+
+  /* Start (or restart) the clock for a candidate. Any change of candidate, or
+     any scrolling, resets it. */
+  function armDwell(sw) {
+    clearTimeout(dwellTimer);
+    if (!sw || !sw.dataset.hex) return;
+    dwellTimer = setTimeout(() => {
+      if (!scrolling) enterFocus(sw);
+    }, DWELL_MS);
+  }
+
+  addEventListener("scroll", () => {
+    clearTimeout(scrolling);
+    clearFocus();                       // scrolling away always releases it
+    scrolling = setTimeout(() => {
+      scrolling = 0;
+      /* Re-arm once the page is still. Without this the clock never starts on
+         a phone: every scroll event clears it, and the picker only arms on a
+         *change* of centred swatch — so stopping on one armed nothing. */
+      armDwell(hoverEl || liveSwatch);
+    }, 160);
+  }, { passive: true });
+
+  addEventListener("keydown", (e) => { if (e.key === "Escape") clearFocus(); });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".pal-swatch")) clearFocus();
+  });
+
+  /* Scroll picker: the swatch nearest the middle of the screen opens itself,
+     dropping the ones below it, and tints the page with its colour. This is
+     what gives the palette any life at all on a phone, where the hover reveal
+     never fires. One swatch is live at a time, across all eight stacks. */
+  (() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let queued = false;
+
+    const pick = () => {
+      queued = false;
+      const middle = innerHeight / 2;
+      let best = null;
+      let bestGap = Infinity;
+
+      root.querySelectorAll(".pal-swatch").forEach((sw) => {
+        if (sw.closest(".pal-section").hidden) return;      // filtered out
+        const box = sw.getBoundingClientRect();
+        if (box.bottom < 0 || box.top > innerHeight) return;
+        const gap = Math.abs(box.top + box.height / 2 - middle);
+        if (gap < bestGap) { bestGap = gap; best = sw; }
+      });
+
+      if (best === liveSwatch) return;
+      if (liveSwatch) liveSwatch.classList.remove("is-live");
+      liveSwatch = best;
+      if (!liveSwatch) return;
+
+      /* A pointer beats the scroll position. Without this the flood showed the
+         centred colour while the mouse was on a different one, and the dwell
+         clock armed the centred swatch — so studying a colour lower down the
+         page focused the wrong one, or nothing at all.
+
+         The centre is still tracked while hovering, so it can reopen when the
+         pointer leaves — but it stays shut, or a scroll would prise it back
+         open underneath the hovered one and two stacks would sit apart. */
+      if (hoverEl) return;
+
+      liveSwatch.classList.add("is-live");
+      if (liveSwatch.dataset.hex) setFlood(liveSwatch.dataset.hex);
+      armDwell(liveSwatch);
+    };
+
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(pick);
+    };
+
+    addEventListener("scroll", schedule, { passive: true });
+    addEventListener("resize", schedule);
+    filterRow.addEventListener("click", () => setTimeout(pick, 40));
+    pick();
+  })();
 
   const status = document.getElementById("copy-status");
   const announce = (msg) => { if (status) status.textContent = msg; };
@@ -282,6 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(sw._t); /* per-element timer: rapid re-clicks restart the full duration */
 
     setFlood(hex);
+    enterFocus(sw);              /* picking it counts as studying it */
     const showCopied = () => {
       sw.classList.add("just-copied");
       announce("Αντιγράφηκε: " + phrase);
