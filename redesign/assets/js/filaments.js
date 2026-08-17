@@ -168,8 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
      choice — heat, flex, sunlight, strength — and to what the studio can
      stand behind, with no claims about certification or food safety. */
   const USES = {
-    "PLA Basics": "Το πιο συνηθισμένο υλικό μας. Ιδανικό για διακοσμητικά, μακέτες, δώρα, μπρελόκ και πρωτότυπα. Δεν αντέχει σε ζέστη — μην το αφήσετε σε παρμπρίζ αυτοκινήτου.",
-    "PLA Matte": "Το ίδιο υλικό με ματ φινίρισμα, που κρύβει τις γραμμές της εκτύπωσης. Για αντικείμενα που θα τα δει κάποιος από κοντά.",
+    "PLA Basics": "Το πιο συνηθισμένο υλικό μας. Ιδανικό για διακοσμητικά, μακέτες, δώρα, μπρελόκ και πρωτότυπα.",
+    "PLA Matte": "Το ίδιο υλικό με ματ φινίρισμα. Για αντικείμενα που θα τα δει κάποιος από κοντά.",
     "ABS": "Αντέχει σε υψηλότερες θερμοκρασίες και σε χτυπήματα. Για λειτουργικά εξαρτήματα και ανταλλακτικά που δουλεύουν, όχι μόνο διακοσμούν.",
     "PETG Translucent": "Ανθεκτικό και ελαφρώς εύκαμπτο, με διαφάνεια. Για φωτιστικά, καλύμματα και αντικείμενα που έρχονται σε επαφή με νερό.",
     "TPU": "Λαστιχένιο και εύκαμπτο. Για θήκες, τάπες, λαβές, αποστάτες — ό,τι πρέπει να λυγίζει χωρίς να σπάει.",
@@ -260,6 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let floodOff;
   const setFlood = (hex) => {
+    /* Black is not floodable. Six of the eight materials carry a #000000, and
+       tinting the page with it just drops the lights — at full strength in
+       study mode it blacks the page out entirely and the swatch it is meant to
+       show disappears into it. Handled here rather than at each call site so
+       hover, the scroll picker, a click and study mode all agree.
+       The 0.02 cut-off is the one the featured heading already uses; the
+       darkest real colour, Blue #0A2989, sits at 0.035 and still floods. */
+    if (hex && luminance(hex) < 0.02) hex = null;
     clearTimeout(floodOff);
     if (!hex) { floodOff = setTimeout(() => flood.classList.remove("is-on"), 260); return; }
     flood.style.setProperty("--flood", hex);
