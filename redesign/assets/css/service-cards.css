@@ -68,9 +68,11 @@
 /* the page scrolls inside its window */
 .is-live .sc-page { animation: sc-scroll 3.2s linear infinite; }
 
+/* -15 is one full pattern length: six lines at 2.5 apart. Anything else lands
+   the second run out of step with the first and the loop visibly snaps. */
 @keyframes sc-scroll {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-7px); }
+  100% { transform: translateY(-15px); }
 }
 
 /* a live card lifts its small icon slightly, so the active one is obvious

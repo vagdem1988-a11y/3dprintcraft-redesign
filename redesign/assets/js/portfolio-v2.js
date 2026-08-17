@@ -426,7 +426,13 @@
     stage.classList.remove('is-panning');
     drag = null;
 
-    if (wasZoomed) return;                       // panning, not navigating
+    /* Zoomed in, a drag was a pan and means nothing here — but a tap that went
+       nowhere is a request to come back out. Without this the only way out was
+       the − button, while the way in was a tap on the picture. */
+    if (wasZoomed) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) zoomTo(1);
+      return;
+    }
 
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
       paint(gallery.at + (dx < 0 ? 1 : -1));

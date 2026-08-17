@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="assets/css/site.css?v=5">
   <link rel="stylesheet" href="assets/css/hero-video.css?v=4">
   <link rel="stylesheet" href="assets/css/hero-cta.css?v=5">
-  <link rel="stylesheet" href="assets/css/service-cards.css?v=2">
+  <link rel="stylesheet" href="assets/css/service-cards.css?v=4">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -162,10 +162,26 @@
         </article>
         <article class="service-card fade-rise" data-d="2">
           <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <defs><clipPath id="scWin"><rect x="3.9" y="8.9" width="16.2" height="9.2"/></clipPath></defs>
+            <!-- The clip used to start at y=8.9, which is exactly where the
+                 address bar's 1.8-wide stroke ends, so lines surfaced flush
+                 against it and read as scrolling into the address. Starting at
+                 9.5 leaves visible daylight under the bar. -->
+            <defs><clipPath id="scWin"><rect x="3.9" y="9.5" width="16.2" height="9.1"/></clipPath></defs>
             <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8h18M6 6h.01M8.4 6h.01"/>
-            <g class="sc-page" clip-path="url(#scWin)">
-              <path d="M6 11h12M6 13.5h8.5M6 16h11M6 18.5h7M6 21h10M6 23.5h9"/>
+            <!-- The clip MUST live on a static wrapper. clip-path is resolved
+                 in the element's own coordinate space, so putting it on the
+                 moving group made the window travel with the text instead of
+                 holding it — which is why lines climbed past the address bar.
+                 Only the inner group moves; the frame stays where it is.
+
+                 Two identical runs of six lines, the second offset by exactly
+                 one pattern length (6 x 2.5 = 15). Scrolling by that same 15
+                 lands run two where run one began, so the loop never snaps. -->
+            <g clip-path="url(#scWin)">
+              <g class="sc-page">
+                <path d="M6 11h12M6 13.5h8.5M6 16h11M6 18.5h7M6 21h10M6 23.5h9"/>
+                <path d="M6 26h12M6 28.5h8.5M6 31h11M6 33.5h7M6 36h10M6 38.5h9"/>
+              </g>
             </g>
           </svg>
           <svg class="sc-bg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
